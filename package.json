@@ -1,0 +1,48 @@
+{
+  "name": "popper",
+  "main": "index.js",
+  "version": "0.0.0",
+  "description": "Realtime Cross-Browser Automation",
+  "dependencies": {
+    "browserify": "8.1.3",
+    "chai": "^2.3.0",
+    "chokidar": "^1.0.3",
+    "compression": "^1.4.4",
+    "d3": "^3.5.5",
+    "express": "^4.12.4",
+    "js-yaml": "^3.3.1",
+    "minimist": "^1.1.1",
+    "mocha": "^2.2.5",
+    "ngrok": "0.1.98",
+    "platform": "^1.3.0",
+    "rijs.resdir": "git://github.com/rijs/resdir.git",
+    "ripple": "git://github.com/pemrouz/ripple",
+    "serve-static": "^1.9.3",
+    "socket.io": "1.3.2",
+    "socket.io-client": "1.3.2",
+    "util-inspect": "0.1.8",
+    "utilise": "git+https://github.com/utilise/utilise.git",
+    "wd": "0.2.10",
+    "yaml": "https://registry.npmjs.org/yaml/-/yaml-0.2.3.tgz"
+  },
+  "devDependencies": {
+    "rijs.core": "git://github.com/rijs/core.git",
+    "rijs.core": "git://github.com/rijs/sync.git",
+    "rijs.data": "git://github.com/rijs/data.git"
+  },
+  "author": "Pedram Emrouznejad (https://github.com/pemrouz)",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pemrouz/popper.git"
+  },
+  "license": "pemrouz.mit-license.org",
+  "bin": "./cli.js",
+  "scripts": {
+    "prepublish": "npm run build",
+    "bundle": "browserify client.js > client/client.js -i colors -i socket.io-client -i socket.io -i jsondiffpatch -i **/utilise/**/*.js",
+    "replace": "sed -i -E \"s/(= _interopRequire\\(require\\(\\\"utilise\\/)(.+)(\\\"\\)\\))/= window['\\2']/\" client/client.js",
+    "minify": "uglifyjs client/client.js -m -c drop_console,dead_code > client/client.min.js",
+    "deps": "uglifyjs node_modules/socket.io-client/socket.io.js > client/socket.io.min.js",
+    "build": "npm run deps && npm run bundle && npm run minify"
+  }
+}

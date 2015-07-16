@@ -1,0 +1,21 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:500,100,300,700);
+
+html, body { 
+  font-family: Roboto, verdana;
+  font-weight: 300;
+  margin: 0;
+  padding: 0; 
+  text-align: center;
+  background: #171d25;
+  color: white;
+  cursor: default;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+}
+
+*, 
+*::before, 
+*::after {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }

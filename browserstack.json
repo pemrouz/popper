@@ -1,0 +1,25 @@
+{
+  "ie9": { 
+    "browserName": "internet explorer"
+  , "version": "9" 
+  , "platform": "WINDOWS" 
+  }
+, "android": { 
+    "browserName": "android"
+  , "device": "Google Nexus 5"
+  , "platform": "ANDROID"  
+  }
+, "iphone": { 
+    "browserName": "iPhone"
+  , "device": "iPhone 5"
+  , "platform": "MAC"  
+  }
+, "opera": { 
+    "browserName": "opera"
+  , "platform": "WINDOWS"  
+  }
+, "safari": { 
+    "browserName": "safari"
+  , "platform": "MAC"  
+  }
+}
