@@ -21,7 +21,7 @@ _Snapshot of Test Results for Ripple v0.3 on latest Chrome, Firefox, IE, Android
 
 ## Roadmap
 
-* **CI Integration**: Have the `popper` command return proper exit codes after running tests across the selected browsers.
+* [[RESOLVED]](https://github.com/pemrouz/popper/issues/2) ~~**CI Integration**: Have the `popper` command return proper exit codes after running tests across the selected browsers.~~
 * **Continous Testing**: Publicise test results for any `<org>/<repo>` so anyone can see it, similar to coveralls for coverage.
 * **Node Tests**: Also run in and aggregate server-side test results from node
 * **Performance**: Include simple performance stats using [perf](https://github.com/utilise/utilise#--perf) per-test
