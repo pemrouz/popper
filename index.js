@@ -33,7 +33,6 @@ module.exports = function(config){
     , debug        = lo(env.NODE_ENV) == 'debug'
     , ci           = 'npm_package_name' in env
     , ngrok        = require('ngrok').connect
-    , glob         = require('glob').sync
     , wd           = require('wd')
     , fs           = require('fs')
     , results      = ripple('results', {}, { from: result })
