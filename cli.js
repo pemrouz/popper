@@ -2,6 +2,7 @@
 var run      = require('child_process').spawn
   , keys     = require('utilise/keys')
   , file     = require('utilise/file')
+  , is       = require('utilise/is')
   , sauce    = require('./sauce')
   , yaml     = require('js-yaml').safeLoad
   , popper   = require('./index')
@@ -15,9 +16,10 @@ var run      = require('child_process').spawn
   , script   = exists('popper.js')
 
 if (help) return usage()
-if (browsers) config.browsers = browsers
+if (browsers) config.browsers = is.str(browsers) ? browsers.split(',') : []
 if (tests) config.tests = tests
 if (port) config.port = port
+  
 return script ? run('sh', ['-c', 'popper.js'], {stdio: 'inherit'})
      : popper(config) 
 

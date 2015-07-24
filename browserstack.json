@@ -4,6 +4,19 @@
   , "version": "9" 
   , "platform": "WINDOWS" 
   }
+, "ie11": { 
+    "browserName": "internet explorer"
+  , "version": "11" 
+  , "platform": "WINDOWS" 
+  }
+, "firefox": { 
+    "browserName": "firefox"
+  , "platform": "WINDOWS" 
+  }
+, "chrome": { 
+    "browserName": "chrome"
+  , "platform": "WINDOWS" 
+  }
 , "android": { 
     "browserName": "android"
   , "device": "Google Nexus 5"

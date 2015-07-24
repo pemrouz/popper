@@ -8,14 +8,12 @@ module.exports = function(config){
     , debounce     = require('utilise/debounce')
     , values       = require('utilise/values')
     , falsy        = require('utilise/falsy')
-    , first        = require('utilise/first')
     , file         = require('utilise/file')
     , noop         = require('utilise/noop')
     , wrap         = require('utilise/wrap')
     , send         = require('utilise/send')
-    , args         = require('utilise/args')
     , not          = require('utilise/not')
-    , via          = require('utilise/via')
+    , str          = require('utilise/str')
     , key          = require('utilise/key')
     , lo           = require('utilise/lo')
     , to           = require('utilise/to')
@@ -33,12 +31,15 @@ module.exports = function(config){
     , ripple       = require('ripple')(server)
     , resdir       = require('rijs.resdir')(ripple, __dirname)
     , debug        = lo(env.NODE_ENV) == 'debug'
+    , ci           = 'npm_package_name' in env
     , ngrok        = require('ngrok').connect
     , glob         = require('glob').sync
     , wd           = require('wd')
     , fs           = require('fs')
     , results      = ripple('results', {}, { from: result })
     , totals       = ripple('totals', {}, { from: falsy })
+    , timeout      = 20000
+    , wait         = debounce(timeout)(quit)
       
   // defaults
   config = config || { }
@@ -91,7 +92,7 @@ module.exports = function(config){
     .use('/'              , serve(local('./client')))
     .use('/'              , index())
 
-  return spawn(), ripple
+  return generate(), spawn(), ripple
 
   function generate() {
     log('generating tests')
@@ -101,24 +102,36 @@ module.exports = function(config){
         : run('sh', ['-c', config.tests], {stdio: 'pipe'}).stdout
 
     ;(stream
-      .on('end', debounce(200)(reload))
+      .on('end', debounce(500)(reload))
       .pipe(bundle)
       .flow || noop)()
   }
 
-  function result(r, results, key){
-    if (only('dashboard')(this)) return reload(key.split('.').shift()), true
+  function result(r, results, uid){
+    if (only('dashboard')(this)) return reload(uid.split('.').shift()), true
     r.platform = this.platform
     results[r.platform.uid] = r
     updateTotals()
+
+    var target = str(key('browsers.length')(config)) || '?'
+      , passed = ripple('totals').passing
+
+    log('ci targets', passed.green.bold, '/', target.grey)
+    ci && passed == target && process.exit(0)
+    ci && passed != target && wait()
+  }
+
+  function quit(){
+    log('no updates received for', timeout/1000, 'seconds. timing out..')
+    process.exit(1)
   }
 
   function updateTotals() {
     var res = values(results)
     ripple('totals', { 
-      tests: String(res.map(key('stats.tests')).filter(Boolean).pop() || '?')
-    , browsers: String(res.length)
-    , passing: String(res.map(key('stats.failures')).filter(is(0)).length || '0')
+      tests: str(res.map(key('stats.tests')).filter(Boolean).pop() || '?')
+    , browsers: str(res.length)
+    , passing: str(res.map(key('stats.failures')).filter(is(0)).length || '0')
     })
   }
 
@@ -129,7 +142,6 @@ module.exports = function(config){
   }
 
   function spawn(){
-    generate()
     server.listen(config.port, function(){
       log('running on port', server.address().port)
       ngrok(server.address().port, function(e, url){
@@ -186,16 +198,6 @@ module.exports = function(config){
 
   function canonical(str){
     if (!is.str(str)) return str
-    // var args = str.split(' ')
-    //   , platform = args.length == 2 ? args.pop() : ''
-    //   , parts = args.join('').match(/([a-z]+) *(\d+)?/)
-    //   , browser = sauce.browsers[args[0]] || sauce.browsers[parts[1]]
-    //   , version = parts[2]
-    //   , platform = sauce.platforms[platform || browser.platform]
-    //   , o = { browserName: browser.name, platform: platform, shortname: str }
-
-    // version && (o.version = version)
-    // return o
     return browserstack[str] 
   }
 
@@ -232,7 +234,7 @@ module.exports = function(config){
       .map(emitReload)
       .length
 
-    log('reloading', String(agents).cyan, 'agents', uid || '')
+    log('reloading', str(agents).cyan, 'agents', uid || '')
   }
 
   function emitReload(socket) {
