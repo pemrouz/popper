@@ -35,7 +35,7 @@
     "url": "git://github.com/pemrouz/popper.git"
   },
   "license": "pemrouz.mit-license.org",
-  "bin": "./cli.js",
+  "bin": "./cli",
   "scripts": {
     "bundle": "browserify client.js > client/client.js -i colors -i socket.io-client -i socket.io -i jsondiffpatch -i **/utilise/**/*.js",
     "replace": "sed -i -E \"s/(= _interopRequire\\(require\\(\\\"utilise\\/)(.+)(\\\"\\)\\))/= window['\\2']/\" client/client.js",
