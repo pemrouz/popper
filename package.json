@@ -37,7 +37,6 @@
   "license": "pemrouz.mit-license.org",
   "bin": "./cli.js",
   "scripts": {
-    "prepublish": "npm run build",
     "bundle": "browserify client.js > client/client.js -i colors -i socket.io-client -i socket.io -i jsondiffpatch -i **/utilise/**/*.js",
     "replace": "sed -i -E \"s/(= _interopRequire\\(require\\(\\\"utilise\\/)(.+)(\\\"\\)\\))/= window['\\2']/\" client/client.js",
     "minify": "uglifyjs client/client.js -m -c drop_console,dead_code > client/client.min.js",
