@@ -1,7 +1,7 @@
 {
   "name": "popper",
   "main": "index.js",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Realtime Cross-Browser Automation",
   "dependencies": {
     "browserify": "8.1.3",
