@@ -37,7 +37,7 @@ module.exports = function(config){
     , fs           = require('fs')
     , results      = ripple('results', {}, { from: result })
     , totals       = ripple('totals', {}, { from: falsy })
-    , timeout      = env.POPPER_TIMEOUT || 20000
+    , timeout      = +env.POPPER_TIMEOUT || 20000
     , wait         = debounce(timeout)(quit)
       
   // defaults
