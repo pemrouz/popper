@@ -1,4 +1,4 @@
-module.exports = function dashboardView(results){
+module.exports = function dashboardView(results){ 
   var o = once(this)
     , suites = first(values(results).filter(key('suites.length')))
 
