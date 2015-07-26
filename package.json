@@ -20,7 +20,6 @@
     "icon-osx": "0.0.1",
     "icon-safari": "0.0.1",
     "icon-windows": "0.0.1",
-    "js-yaml": "^3.3.1",
     "minimist": "^1.1.1",
     "mocha": "^2.2.5",
     "ngrok": "0.1.98",
