@@ -20,7 +20,7 @@ if (browsers) config.browsers = is.str(browsers) ? browsers.split(',') : []
 if (tests) config.tests = tests
 if (port) config.port = port
   
-return script ? run('sh', ['-c', 'popper.js'], {stdio: 'inherit'})
+return script ? run('sh', ['-c', 'node popper.js'], {stdio: 'inherit'})
      : popper(config) 
 
 function usage(){
