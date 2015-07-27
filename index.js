@@ -28,7 +28,7 @@ module.exports = function(config){
     , chokidar     = require('chokidar')
     , app          = require('express')()
     , server       = require('http').createServer(app)
-    , ripple       = (config.ripple || require('ripple'))(server)
+    , ripple       = (config.ripple || require('rijs'))(server)
     , resdir       = require('rijs.resdir')(ripple, __dirname)
     , debug        = lo(env.NODE_ENV) == 'debug'
     , ci           = 'npm_package_name' in env
