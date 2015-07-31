@@ -7,7 +7,7 @@ _Snapshot of Test Results for Ripple v0.3 on latest Chrome, Firefox, IE, Android
 
 ## Features
 
-* **Spawn** agents using BrowserStack/Sauce
+* **Spawn** agents using BrowserStack/Sauce/TestingBot
 * **Multi-repo** testing, where changing one module might affect others (e.g microlibs in [utilise](https://github.com/utilise/utilise) or modules in [ripple v0.3](https://github.com/pemrouz/ripple))
 * **Aggregate** results per-repo, per-browser and globally in realtime 
 * Rerun on **file change**
@@ -86,7 +86,7 @@ tests: browserify ./node_modules/*/test.js
   | sed -E "s/require\('d3'\)/window.d3/"
   | uglifyjs
 
-# browsers to spawn in browserstack/sauce 
+# browsers to spawn in browserstack/sauce/testingbot
 # can be wd capabilities object to specify os, device, version, etc: https://www.browserstack.com/automate/capabilities
 browsers: 
   - ie9
