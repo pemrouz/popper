@@ -113,7 +113,7 @@ module.exports = function(config){
     var target = str(key('browsers.length')(config)) || '?'
       , passed = ripple('totals').passing
 
-    log('ci targets', passed.green.bold, '/', target.grey)
+    ci && log('ci targets', passed.green.bold, '/', target.grey)
     ci && passed == target && process.exit(0)
     ci && passed != target && wait()
   }
