@@ -23,7 +23,6 @@
     "js-yaml": "^3.3.1",
     "minimist": "^1.1.1",
     "mocha": "^2.2.5",
-    "ngrok": "0.1.98",
     "platform": "^1.3.0",
     "rijs.resdir": "*",
     "rijs": "*",
@@ -33,6 +32,9 @@
     "util-inspect": "0.1.8",
     "utilise": "*",
     "wd": "0.2.10"
+  },
+  "optionalDependencies": {
+    "ngrok": "0.1.98"
   },
   "devDependencies": {
     "rijs.core": "*",

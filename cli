@@ -11,6 +11,7 @@ var run      = require('child_process').spawn
   , browsers = argv.b || argv.browsers
   , tests    = argv.t || argv.tests
   , help     = argv.h || argv.help
+  , notunnel = argv.n || argv.notunnel
   , exists   = require('fs').existsSync
   , config   = exists('.popper.yml') ? yaml(file('.popper.yml')) : {}
   , script   = exists('popper.js')
@@ -19,6 +20,7 @@ if (help) return usage()
 if (browsers) config.browsers = is.str(browsers) ? browsers.split(',') : []
 if (tests) config.tests = tests
 if (port) config.port = port
+if (notunnel) config.notunnel = true
   
 return script ? run('sh', ['-c', 'node popper.js'], {stdio: 'inherit'})
      : popper(config) 

@@ -32,7 +32,6 @@ module.exports = function(config){
     , resdir       = require('rijs.resdir')(ripple, __dirname)
     , debug        = lo(env.NODE_ENV) == 'debug'
     , ci           = 'npm_package_name' in env
-    , ngrok        = require('ngrok').connect
     , wd           = require('wd')
     , fs           = require('fs')
     , results      = ripple('results', {}, { from: result })
@@ -142,7 +141,7 @@ module.exports = function(config){
   function spawn(){
     server.listen(config.port, function(){
       log('running on port', server.address().port)
-      ngrok(server.address().port, function(e, url){
+      !config.notunnel && require('ngrok').connect(server.address().port, function(e, url){
         log('tunnelling', url.magenta)
         return e ? err('error setting up reverse tunnel', e.stack)
                  : (config.browsers || [])
