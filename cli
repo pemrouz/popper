@@ -34,5 +34,6 @@ function usage(){
   console.error('    -t, --test: command to generate test bundle, defaults to "browserify test.js"')
   console.error('    -p, --port: port to run on, default to 1945')
   console.error('    -w, --watch: files to watch for changes, default to .')
+  console.error('    -n, --notunnel: disable opening tunnel')
   process.exit(1)
 }
