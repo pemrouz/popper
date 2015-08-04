@@ -31,7 +31,7 @@ _Snapshot of Test Results for Ripple v0.3 on latest Chrome, Firefox, IE, Android
 * **Pooling**: Allowing pooling agents rather than running on all open test agents
 * **Sauce Labs**: Readd support for Sauce Labs
 * **`.popperrc`**: For changing global defaults
-* **Optional Tunnel**: Allow completely disabling the tunnelling via ngrok
+* [[RESOLVED]](https://github.com/pemrouz/popper/issues/5) ~~**Optional Tunnel**: Allow completely disabling the tunnelling via ngrok~~
 
 ## Usage 
 
@@ -130,6 +130,7 @@ watch:
     -t, --test: command to generate test bundle, defaults to "browserify test.js"
     -p, --port: port to run on, default to 1945
     -w, --watch: files to watch for changes, default to .
+    -n, --notunnel: disable opening tunnel
 ```
 
 ### Default Options
