@@ -199,8 +199,9 @@ module.exports = function(config){
   }
 
   function index(){
-    var html = file(local('./client/test.html'))
-          .replace('<!-- { extra scripts } -->', config.globals || '')
+    var globals = is.arr(config.globals) ? config.globals.join('\n') : config.globals
+      , html = file(local('./client/test.html'))
+          .replace('<!-- { extra scripts } -->', globals || '')
 
     return function(req, res){
       res.send(html)
