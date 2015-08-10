@@ -18,6 +18,9 @@ _Snapshot of Test Results for Ripple v0.3 on latest Chrome, Firefox, IE, Android
 * Proxy console/error statements, making **remote debugging** on mobile devices a lot easier
 * **Force a rerun** on a particular agent
 * **View a snapshot of the results page** as produced by the agent
+* **CI Integration** by having `npm test` run `popper` which will return exit cleanly if the tests pass in all defined browsers
+* **Increase CI Timeout** by setting `POPPER_TIMEOUT=milliseconds` to help investigate why a CI test is failiing (defaults to 20s)
+* **Optional Tunnel** to allow completely disabling the tunnelling via ngrok
 
 ## Roadmap
 
