@@ -1,6 +1,7 @@
 module.exports = function(config){
   var env          = process.env
     , cwd          = process.cwd()
+    , dir          = __dirname
     , unfiltered   = require('utilise/grep')(console, 'log', /^(?!.*\[ri\/)/)
     , log          = require('utilise/log')('[popper]')
     , err          = require('utilise/err')('[popper]')
@@ -28,7 +29,7 @@ module.exports = function(config){
     , chokidar     = require('chokidar')
     , app          = require('express')()
     , server       = require('http').createServer(app)
-    , ripple       = (config.ripple || require('rijs'))(server)
+    , ripple       = (config.ripple || require('rijs'))({ server, dir })
     , resdir       = require('rijs.resdir')(ripple, __dirname)
     , debug        = lo(env.NODE_ENV) == 'debug'
     , ci           = 'npm_package_name' in env
