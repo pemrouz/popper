@@ -72,8 +72,10 @@ module.exports = function(config){
     .resource(require('icon-windows'))
 
   // limit dashboard resources
-  values(ripple.resources)
-    .map(key('headers.proxy-to', wrap(only('dashboard'))))
+  debounce(function(){
+    values(ripple.resources)
+      .map(key('headers.proxy-to', wrap(only('dashboard'))))
+  })()
 
   // proxy errors and register agent details
   ripple.io.on('connection', connected)
