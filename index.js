@@ -146,7 +146,7 @@ module.exports = function(config){
     server.listen(config.port, function(){
       log('running on port', server.address().port)
       !config.notunnel && require('ngrok').connect(server.address().port, function(e, url){
-        log('tunnelling', url.magenta)
+        log('tunnelling', url && url.magenta)
         return e ? err('error setting up reverse tunnel', e.stack)
                  : (config.browsers || [])
                     .map(canonical)
