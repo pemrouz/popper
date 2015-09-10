@@ -34,7 +34,7 @@
     "wd": "*"
   },
   "optionalDependencies": {
-    "ngrok": "*"
+    "ngrok": "0.1.98"
   },
   "devDependencies": {
     "rijs.core": "*",
