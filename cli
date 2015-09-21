@@ -13,8 +13,11 @@ var run      = require('child_process').spawn
   , help     = argv.h || argv.help
   , notunnel = argv.n || argv.notunnel
   , exists   = require('fs').existsSync
-  , config   = exists('.popper.yml') ? yaml(file('.popper.yml')) : {}
   , script   = exists('popper.js')
+  , config   = exists('.popper')     ? yaml(file('.popper'))
+             : exists('popper.yml')  ? yaml(file('popper.yml'))
+             : exists('.popper.yml') ? yaml(file('.popper.yml'))
+             : {}
 
 if (help) return usage()
 if (browsers) config.browsers = is.str(browsers) ? browsers.split(',') : []
