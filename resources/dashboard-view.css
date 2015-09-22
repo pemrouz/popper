@@ -46,6 +46,7 @@
     padding-top: 120px; }
 
     .totals {
+      display: none;
       position: absolute;
       top: 0;
       left: 0px;
@@ -54,6 +55,9 @@
       text-align: left;
       font-weight: 700; }
 
+    :host(.has-results) .totals {
+      display: block; }
+    
       [label]::after {
         content: attr(label);
         margin-left: 42px;

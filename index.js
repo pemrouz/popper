@@ -111,7 +111,7 @@ module.exports = function(config){
   function result(r, results, uid){
     if (only('dashboard')(this)) return reload(uid.split('.').shift()), true
     r.platform = this.platform
-    results[r.platform.uid] = r
+    ripple('results')[r.platform.uid] = r
     updateTotals()
 
     var target = str(key('browsers.length')(config)) || '?'
