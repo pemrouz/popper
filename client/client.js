@@ -311,9 +311,11 @@ function change(ripple) {
     log("receiving", req.name);
 
     var socket = this,
-        res = ripple.resources[req.name];
+        res = ripple.resources[req.name],
+        check = type(ripple)(req).from || identity;
 
     if (!res) return log("no resource", req.name);
+    if (!check.call(this, req)) return debug("type skip", req.name);
     if (!is.obj(res.body)) return silent(ripple)(req);
 
     var to = header("proxy-to")(res) || identity,
@@ -423,20 +425,20 @@ function to(ripple) {
   return function (res) {
     return function (socket) {
       var body = is.fn(res.body) ? "" + res.body : res.body,
+          rep,
           fn = {
         type: type(ripple)(res).to || identity,
         res: res.headers["proxy-to"] || identity
       };
 
       body = fn.res.call(socket, body);
+      if (!body) return false;
 
-      body && socket.emit("change", fn.type({
-        name: res.name,
-        body: body,
-        headers: res.headers
-      }));
+      rep = fn.type.call(socket, { name: res.name, body: body, headers: res.headers });
+      if (!rep) return false;
 
-      return !!body;
+      socket.emit("change", rep);
+      return true;
     };
   };
 }
@@ -494,7 +496,8 @@ var diff = require("jsondiffpatch").diff;
 
 log = log("[ri/sync]");
 err = err("[ri/sync]");
-var types = { push: push, remove: remove, update: update };
+var types = { push: push, remove: remove, update: update },
+    debug = noop;
 },{"jsondiffpatch":2,"socket.io":2,"socket.io-client":2,"utilise/by":8,"utilise/client":10,"utilise/err":16,"utilise/flatten":18,"utilise/header":21,"utilise/identity":22,"utilise/is":24,"utilise/key":25,"utilise/keys":26,"utilise/log":27,"utilise/noop":28,"utilise/not":29,"utilise/prepend":31,"utilise/replace":34,"utilise/str":36,"utilise/values":38}],7:[function(require,module,exports){
 var to = require('utilise/to')
 

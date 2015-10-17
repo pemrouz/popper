@@ -7,6 +7,7 @@ module.exports = function(config){
     , err          = require('utilise/err')('[popper]')
     , run          = require('child_process').spawn
     , debounce     = require('utilise/debounce')
+    , extend       = require('utilise/extend')
     , values       = require('utilise/values')
     , falsy        = require('utilise/falsy')
     , file         = require('utilise/file')
@@ -29,7 +30,7 @@ module.exports = function(config){
     , chokidar     = require('chokidar')
     , app          = require('express')()
     , server       = require('http').createServer(app)
-    , opts         = { server: server, dir: dir }
+    , opts         = extend({ server: server, dir: dir })(config.opts)
     , ripple       = (config.ripple || require('rijs'))(opts)
     , resdir       = require('rijs.resdir')(ripple, __dirname)
     , debug        = lo(env.NODE_ENV) == 'debug'
@@ -72,11 +73,9 @@ module.exports = function(config){
     .resource(require('icon-windows'))
 
   // limit dashboard resources
-  debounce(function(){
-    values(ripple.resources)
-      .map(key('headers.proxy-to', wrap(only('dashboard'))))
-  })()
-
+  values(ripple.resources)
+    .map(key('headers.proxy-to', wrap(only('dashboard'))))
+  
   // proxy errors and register agent details
   ripple.io.on('connection', connected)
 
@@ -112,6 +111,7 @@ module.exports = function(config){
     if (only('dashboard')(this)) return reload(uid.split('.').shift()), true
     r.platform = this.platform
     ripple('results')[r.platform.uid] = r
+    ripple.sync()('results')
     updateTotals()
 
     var target = str(key('browsers.length')(config)) || '?'
