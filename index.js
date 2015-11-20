@@ -31,8 +31,8 @@ module.exports = function(config){
     , app          = require('express')()
     , server       = require('http').createServer(app)
     , opts         = extend({ server: server, dir: dir })(config.opts)
-    , ripple       = (config.ripple || require('rijs'))(opts)
-    , resdir       = require('rijs.resdir')(ripple, __dirname)
+    , ripple       = (config.ripple || require('rijs').default)(opts)
+    , resdir       = require('rijs.resdir').default(ripple, __dirname)
     , debug        = lo(env.NODE_ENV) == 'debug'
     , ci           = 'npm_package_name' in env
     , wd           = require('wd')

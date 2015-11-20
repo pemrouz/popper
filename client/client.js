@@ -1,7 +1,7 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var core   = require('rijs.core')
-  , data   = require('rijs.data')
-  , sync   = require('rijs.sync')
+var core   = require('rijs.core').default
+  , data   = require('rijs.data').default
+  , sync   = require('rijs.sync').default
   , ripple = sync(data(core()))
   , to = require('utilise/to')
   , all = require('utilise/all')
@@ -62,13 +62,62 @@ function param(p){
   var candidate = window.location.search.split(p+'=').pop().split('&').shift().split('#').shift()
   return candidate != window.location.search ? candidate : ''
 }
-},{"rijs.core":3,"rijs.data":5,"rijs.sync":6,"utilise/all":7,"utilise/raw":32,"utilise/to":37}],2:[function(require,module,exports){
+},{"rijs.core":3,"rijs.data":5,"rijs.sync":34,"utilise/all":6,"utilise/raw":27,"utilise/to":31}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
-"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = core;
+
+var _emitterify = require('utilise/emitterify');
+
+var _emitterify2 = _interopRequireDefault(_emitterify);
+
+var _colorfill = require('utilise/colorfill');
+
+var _colorfill2 = _interopRequireDefault(_colorfill);
+
+var _chainable = require('utilise/chainable');
+
+var _chainable2 = _interopRequireDefault(_chainable);
+
+var _identity = require('utilise/identity');
+
+var _identity2 = _interopRequireDefault(_identity);
+
+var _rebind = require('utilise/rebind');
+
+var _rebind2 = _interopRequireDefault(_rebind);
+
+var _header = require('utilise/header');
+
+var _header2 = _interopRequireDefault(_header);
+
+var _values = require('utilise/values');
+
+var _values2 = _interopRequireDefault(_values);
+
+var _is = require('utilise/is');
+
+var _is2 = _interopRequireDefault(_is);
+
+var _to = require('utilise/to');
+
+var _to2 = _interopRequireDefault(_to);
+
+var _za = require('utilise/za');
+
+var _za2 = _interopRequireDefault(_za);
+
+var _text = require('./types/text');
+
+var _text2 = _interopRequireDefault(_text);
 
 /* istanbul ignore next */
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // -------------------------------------------
 // API: Gets or sets a resource
@@ -83,46 +132,18 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 // ripple.on          - event listener for changes - all resources
 // ripple('name').on  - event listener for changes - resource-specific
 
-module.exports = core;
-
 function core() {
-  log("creating");
+  log('creating');
 
   var resources = {};
   ripple.resources = resources;
-  ripple.resource = chainable(ripple);
+  ripple.resource = (0, _chainable2.default)(ripple);
   ripple.register = ripple;
   ripple.types = types();
-  return emitterify(ripple);
+  return (0, _emitterify2.default)(ripple);
 
-  function ripple(_x, _x2, _x3) {
-    var _again = true;
-
-    _function: while (_again) {
-      _again = false;
-      var name = _x,
-          body = _x2,
-          headers = _x3;
-      if (!name) {
-        return ripple;
-      } else {
-        if (is.arr(name)) {
-          return name.map(ripple);
-        } else {
-          if (is.obj(name) && !name.name) {
-            return ripple;
-          } else {
-            if (is.fn(name) && name.resources) {
-              _x = values(name.resources);
-              _again = true;
-              continue _function;
-            } else {
-              return is.str(name) && !body && resources[name] ? resources[name].body : is.str(name) && !body && !resources[name] ? register(ripple)({ name: name }) : is.str(name) && body ? register(ripple)({ name: name, body: body, headers: headers }) : is.obj(name) && !is.arr(name) ? register(ripple)(name) : (err("could not find or create resource", name), false);
-            }
-          }
-        }
-      }
-    }
+  function ripple(name, body, headers) {
+    return !name ? ripple : _is2.default.arr(name) ? name.map(ripple) : _is2.default.obj(name) && !name.name ? ripple : _is2.default.fn(name) && name.resources ? ripple((0, _values2.default)(name.resources)) : _is2.default.str(name) && !body && resources[name] ? resources[name].body : _is2.default.str(name) && !body && !resources[name] ? register(ripple)({ name: name }) : _is2.default.str(name) && body ? register(ripple)({ name: name, body: body, headers: headers }) : _is2.default.obj(name) && !_is2.default.arr(name) ? register(ripple)(name) : (err('could not find or create resource', name), false);
   }
 }
 
@@ -133,116 +154,125 @@ function register(ripple) {
     var _ref$headers = _ref.headers;
     var headers = _ref$headers === undefined ? {} : _ref$headers;
 
-    log("registering", name);
+    log('registering', name);
     var res = normalise(ripple)({ name: name, body: body, headers: headers }),
-        type = !ripple.resources[name] ? "load" : "";
+        type = !ripple.resources[name] ? 'load' : '';
 
-    if (!res) return (err("failed to register", name), false);
+    if (!res) return err('failed to register', name), false;
     ripple.resources[name] = res;
-    ripple.emit("change", [ripple.resources[name], { type: type }]);
+    ripple.emit('change', [ripple.resources[name], { type: type }]);
     return ripple.resources[name].body;
   };
 }
 
 function normalise(ripple) {
   return function (res) {
-    if (!header("content-type")(res)) values(ripple.types).sort(za("priority")).some(contentType(res));
-    if (!header("content-type")(res)) return (err("could not understand resource", res), false);
+    if (!(0, _header2.default)('content-type')(res)) (0, _values2.default)(ripple.types).sort((0, _za2.default)('priority')).some(contentType(res));
+    if (!(0, _header2.default)('content-type')(res)) return err('could not understand resource', res), false;
     return parse(ripple)(res);
   };
 }
 
 function parse(ripple) {
   return function (res) {
-    var type = header("content-type")(res);
-    if (!ripple.types[type]) return (err("could not understand type", type), false);
-    return (ripple.types[type].parse || identity)(res);
+    var type = (0, _header2.default)('content-type')(res);
+    if (!ripple.types[type]) return err('could not understand type', type), false;
+    return (ripple.types[type].parse || _identity2.default)(res);
   };
 }
 
 function contentType(res) {
   return function (type) {
-    return type.check(res) && (res.headers["content-type"] = type.header);
+    return type.check(res) && (res.headers['content-type'] = type.header);
   };
 }
 
 function types() {
-  return [text].reduce(to.obj("header"), 1);
+  return [_text2.default].reduce(_to2.default.obj('header'), 1);
 }
 
-var emitterify = _interopRequire(require("utilise/emitterify"));
+var err = require('utilise/err')('[ri/core]'),
+    log = require('utilise/log')('[ri/core]');
+},{"./types/text":4,"utilise/chainable":7,"utilise/colorfill":9,"utilise/emitterify":13,"utilise/err":14,"utilise/header":18,"utilise/identity":19,"utilise/is":21,"utilise/log":24,"utilise/rebind":28,"utilise/to":31,"utilise/values":32,"utilise/za":33}],4:[function(require,module,exports){
+'use strict';
 
-var colorfill = _interopRequire(require("utilise/colorfill"));
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var chainable = _interopRequire(require("utilise/chainable"));
+var _includes = require('utilise/includes');
 
-var identity = _interopRequire(require("utilise/identity"));
+var _includes2 = _interopRequireDefault(_includes);
 
-var rebind = _interopRequire(require("utilise/rebind"));
+var _is = require('utilise/is');
 
-var header = _interopRequire(require("utilise/header"));
-
-var values = _interopRequire(require("utilise/values"));
-
-var err = _interopRequire(require("utilise/err"));
-
-var log = _interopRequire(require("utilise/log"));
-
-var is = _interopRequire(require("utilise/is"));
-
-var to = _interopRequire(require("utilise/to"));
-
-var za = _interopRequire(require("utilise/za"));
-
-var text = _interopRequire(require("./types/text"));
-
-err = err("[ri/core]");
-log = log("[ri/core]");
-},{"./types/text":4,"utilise/chainable":9,"utilise/colorfill":11,"utilise/emitterify":15,"utilise/err":16,"utilise/header":21,"utilise/identity":22,"utilise/is":24,"utilise/log":27,"utilise/rebind":33,"utilise/to":37,"utilise/values":38,"utilise/za":39}],4:[function(require,module,exports){
-"use strict";
+var _is2 = _interopRequireDefault(_is);
 
 /* istanbul ignore next */
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-module.exports = {
-  header: "text/plain",
+exports.default = {
+  header: 'text/plain',
   check: function check(res) {
-    return !includes(".html")(res.name) && !includes(".css")(res.name) && is.str(res.body);
+    return !(0, _includes2.default)('.html')(res.name) && !(0, _includes2.default)('.css')(res.name) && _is2.default.str(res.body);
   }
 };
+},{"utilise/includes":20,"utilise/is":21}],5:[function(require,module,exports){
+'use strict';
 
-var includes = _interopRequire(require("utilise/includes"));
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = data;
 
-var is = _interopRequire(require("utilise/is"));
-},{"utilise/includes":23,"utilise/is":24}],5:[function(require,module,exports){
-"use strict";
+var _emitterify = require('utilise/emitterify');
+
+var _emitterify2 = _interopRequireDefault(_emitterify);
+
+var _header = require('utilise/header');
+
+var _header2 = _interopRequireDefault(_header);
+
+var _extend = require('utilise/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _not = require('utilise/not');
+
+var _not2 = _interopRequireDefault(_not);
+
+var _is = require('utilise/is');
+
+var _is2 = _interopRequireDefault(_is);
+
+var _to = require('utilise/to');
+
+var _to2 = _interopRequireDefault(_to);
 
 /* istanbul ignore next */
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // -------------------------------------------
 // Adds support for data resources
 // -------------------------------------------
-module.exports = data;
-
 function data(ripple) {
-  log("creating");
-  ripple.on("change.data", trickle(ripple));
-  ripple.types["application/data"] = {
-    header: "application/data",
+  log('creating');
+  ripple.on('change.data', trickle(ripple));
+  ripple.types['application/data'] = {
+    header: 'application/data',
     check: function check(res) {
-      return is.obj(res.body) || !res.body ? true : false;
+      return _is2.default.obj(res.body) || !res.body ? true : false;
     },
     parse: function parse(res) {
       var existing = ripple.resources[res.name] || {};
       delete res.headers.listeners;
-      extend(res.headers)(existing.headers);
+      (0, _extend2.default)(res.headers)(existing.headers);
 
       !res.body && (res.body = []);
-      !res.body.on && (res.body = emitterify(res.body));
+      !res.body.on && (res.body = (0, _emitterify2.default)(res.body));
       res.body.on.change = res.headers.listeners = res.headers.listeners || [];
-      res.body.on("change.bubble", function () {
-        return ripple.emit("change", [res], not(is["in"](["data"])));
+      res.body.on('change.bubble', function () {
+        return ripple.emit('change', [res], (0, _not2.default)(_is2.default.in(['data'])));
       });
 
       return res;
@@ -255,280 +285,27 @@ function data(ripple) {
 function trickle(ripple) {
   return function (res) {
     var args = [arguments[0].body, arguments[1]];
-    return header("content-type", "application/data")(res) && ripple.resources[res.name].body.emit("change", to.arr(args), not(is["in"](["bubble"])));
+    return (0, _header2.default)('content-type', 'application/data')(res) && ripple.resources[res.name].body.emit('change', _to2.default.arr(args), (0, _not2.default)(_is2.default.in(['bubble'])));
   };
 }
 
-var emitterify = _interopRequire(require("utilise/emitterify"));
-
-var header = _interopRequire(require("utilise/header"));
-
-var extend = _interopRequire(require("utilise/extend"));
-
-var not = _interopRequire(require("utilise/not"));
-
-var log = _interopRequire(require("utilise/log"));
-
-var is = _interopRequire(require("utilise/is"));
-
-var to = _interopRequire(require("utilise/to"));
-
-log = log("[ri/types/data]");
-},{"utilise/emitterify":15,"utilise/extend":17,"utilise/header":21,"utilise/is":24,"utilise/log":27,"utilise/not":29,"utilise/to":37}],6:[function(require,module,exports){
-"use strict";
-
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
-
-// -------------------------------------------
-// API: Synchronises resources between server/client
-// -------------------------------------------
-module.exports = sync;
-
-function sync(ripple, server) {
-  log("creating");
-
-  if (!client && !server) {
-    return;
-  }values(ripple.types).map(headers(ripple));
-  ripple.sync = emit(ripple);
-  ripple.io = io(server);
-  ripple.on("change", function (res) {
-    return emit(ripple)()(res.name);
-  });
-  ripple.io.on("change", silent(ripple));
-  ripple.io.on("connection", function (s) {
-    return s.on("change", change(ripple));
-  });
-  ripple.io.on("connection", function (s) {
-    return emit(ripple)(s)();
-  });
-  ripple.io.use(setIP);
-  return ripple;
-}
-
-function change(ripple) {
-  return function (req) {
-    log("receiving", req.name);
-
-    var socket = this,
-        res = ripple.resources[req.name],
-        check = type(ripple)(req).from || identity;
-
-    if (!res) return log("no resource", req.name);
-    if (!check.call(this, req)) return debug("type skip", req.name);
-    if (!is.obj(res.body)) return silent(ripple)(req);
-
-    var to = header("proxy-to")(res) || identity,
-        from = header("proxy-from")(res),
-        body = to.call(socket, key("body")(res)),
-        deltas = diff(body, req.body);
-
-    if (is.arr(deltas)) return delta("") && res.body.emit("change");
-
-    keys(deltas).reverse().filter(not(is("_t"))).map(paths(deltas)).reduce(flatten, []).map(delta).some(Boolean) && res.body.emit("change");
-
-    function delta(k) {
-      var d = key(k)(deltas),
-          name = req.name
-      // , body  = res.body
-      ,
-          index = k.replace(/(^|\.)_/g, "$1"),
-          type = d.length == 1 ? "push" : d.length == 2 ? "update" : d[2] === 0 ? "remove" : "",
-          value = type == "update" ? d[1] : d[0],
-          next = types[type];
-
-      if (!type) {
-        return false;
-      }if (!from || from.call(socket, value, body, index, type, name, next)) {
-        !index ? silent(ripple)(req) : next(index, value, body, name, res);
-        return true;
-      }
-    }
-  };
-}
-
-function paths(base) {
-  return function (k) {
-    var d = key(k)(base);
-    k = is.arr(k) ? k : [k];
-
-    return is.arr(d) ? k.join(".") : keys(d).map(prepend(k.join(".") + ".")).map(paths(base));
-  };
-}
-
-function push(k, value, body, name) {
-  var path = k.split("."),
-      tail = path.pop(),
-      o = key(path.join("."))(body) || body;
-
-  is.arr(o) ? o.splice(tail, 0, value) : key(k, value)(body);
-}
-
-function remove(k, value, body, name) {
-  var path = k.split("."),
-      tail = path.pop(),
-      o = key(path.join("."))(body) || body;
-
-  is.arr(o) ? o.splice(tail, 1) : delete o[tail];
-}
-
-function update(k, value, body, name) {
-  key(k, value)(body);
-}
-
-function headers(ripple) {
-  return function (type) {
-    var parse = type.parse || noop;
-    type.parse = function (res) {
-      if (client) return (parse.apply(this, arguments), res);
-      var existing = ripple.resources[res.name],
-          from = header("proxy-from")(existing),
-          to = header("proxy-to")(existing);
-
-      res.headers["proxy-from"] = header("proxy-from")(res) || header("from")(res) || from;
-      res.headers["proxy-to"] = header("proxy-to")(res) || header("to")(res) || to;
-      return (parse.apply(this, arguments), res);
-    };
-  };
-}
-
-function silent(ripple) {
-  return function (res) {
-    return (res.headers.silent = true, ripple(res));
-  };
-}
-
-function io(opts) {
-  var r = !client ? require("socket.io")(opts.server || opts) : window.io ? window.io() : is.fn(require("socket.io-client")) ? require("socket.io-client")() : { on: noop, emit: noop };
-  r.use = r.use || noop;
-  return r;
-}
-
-// emit all or some resources, to all or some clients
-function emit(ripple) {
-  return function (socket) {
-    return function (name) {
-      if (arguments.length && !name) return;
-      if (!name) return (values(ripple.resources).map(key("name")).map(emit(ripple)(socket)), ripple);
-
-      var res = ripple.resources[name],
-          sockets = client ? [ripple.io] : ripple.io.of("/").sockets,
-          lgt = stats(sockets.length, name),
-          silent = header("silent", true)(res);
-
-      return silent ? delete res.headers.silent : !res ? log("no resource to emit: ", name) : is.str(socket) ? lgt(sockets.filter(by("sessionID", socket)).map(to(ripple)(res))) : !socket ? lgt(sockets.map(to(ripple)(res))) : lgt([to(ripple)(res)(socket)]);
-    };
-  };
-}
-
-function to(ripple) {
-  return function (res) {
-    return function (socket) {
-      var body = is.fn(res.body) ? "" + res.body : res.body,
-          rep,
-          fn = {
-        type: type(ripple)(res).to || identity,
-        res: res.headers["proxy-to"] || identity
-      };
-
-      body = fn.res.call(socket, body);
-      if (!body) return false;
-
-      rep = fn.type.call(socket, { name: res.name, body: body, headers: res.headers });
-      if (!rep) return false;
-
-      socket.emit("change", rep);
-      return true;
-    };
-  };
-}
-
-function stats(total, name) {
-  return function (results) {
-    log(str(results.filter(Boolean).length).green.bold + "/" + str(total).green, "sending", name);
-  };
-}
-
-function setIP(socket, next) {
-  socket.ip = socket.request.headers["x-forwarded-for"] || socket.request.connection.remoteAddress;
-  next();
-}
-
-function type(ripple) {
-  return function (res) {
-    return ripple.types[header("content-type")(res)];
-  };
-}
-
-var identity = _interopRequire(require("utilise/identity"));
-
-var replace = _interopRequire(require("utilise/replace"));
-
-var prepend = _interopRequire(require("utilise/prepend"));
-
-var flatten = _interopRequire(require("utilise/flatten"));
-
-var values = _interopRequire(require("utilise/values"));
-
-var header = _interopRequire(require("utilise/header"));
-
-var client = _interopRequire(require("utilise/client"));
-
-var noop = _interopRequire(require("utilise/noop"));
-
-var keys = _interopRequire(require("utilise/keys"));
-
-var key = _interopRequire(require("utilise/key"));
-
-var str = _interopRequire(require("utilise/str"));
-
-var not = _interopRequire(require("utilise/not"));
-
-var log = _interopRequire(require("utilise/log"));
-
-var err = _interopRequire(require("utilise/err"));
-
-var by = _interopRequire(require("utilise/by"));
-
-var is = _interopRequire(require("utilise/is"));
-
-var diff = require("jsondiffpatch").diff;
-
-log = log("[ri/sync]");
-err = err("[ri/sync]");
-var types = { push: push, remove: remove, update: update },
-    debug = noop;
-},{"jsondiffpatch":2,"socket.io":2,"socket.io-client":2,"utilise/by":8,"utilise/client":10,"utilise/err":16,"utilise/flatten":18,"utilise/header":21,"utilise/identity":22,"utilise/is":24,"utilise/key":25,"utilise/keys":26,"utilise/log":27,"utilise/noop":28,"utilise/not":29,"utilise/prepend":31,"utilise/replace":34,"utilise/str":36,"utilise/values":38}],7:[function(require,module,exports){
+var log = require('utilise/log')('[ri/types/data]');
+},{"utilise/emitterify":13,"utilise/extend":15,"utilise/header":18,"utilise/is":21,"utilise/log":24,"utilise/not":25,"utilise/to":31}],6:[function(require,module,exports){
 var to = require('utilise/to')
 
 module.exports = function all(selector, doc){
   var prefix = !doc && document.head.createShadowRoot ? 'html /deep/ ' : ''
   return to.arr((doc || document).querySelectorAll(prefix+selector))
 }
-},{"utilise/to":37}],8:[function(require,module,exports){
-var key = require('utilise/key')
-  , is  = require('utilise/is')
-
-module.exports = function by(k, v){
-  var exists = arguments.length == 1
-  return function(o){
-    var d = key(k)(o)
-    
-    return d && v && d.toLowerCase && v.toLowerCase ? d.toLowerCase() === v.toLowerCase()
-         : exists ? Boolean(d)
-         : is.fn(v) ? v(d)
-         : d == v
-  }
-}
-},{"utilise/is":24,"utilise/key":25}],9:[function(require,module,exports){
+},{"utilise/to":31}],7:[function(require,module,exports){
 module.exports = function chainable(fn) {
   return function(){
     return fn.apply(this, arguments), fn
   }
 }
-},{}],10:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 module.exports = typeof window != 'undefined'
-},{}],11:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var client = require('utilise/client')
   , colors = !client && require('colors')
   , has = require('utilise/has')
@@ -548,19 +325,19 @@ function colorfill(){
 }
 
 
-},{"colors":2,"utilise/client":10,"utilise/has":20,"utilise/is":24}],12:[function(require,module,exports){
+},{"colors":2,"utilise/client":8,"utilise/has":17,"utilise/is":21}],10:[function(require,module,exports){
 module.exports = function copy(from, to){ 
   return function(d){ 
     return to[d] = from[d], d
   }
 }
-},{}],13:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var sel = require('utilise/sel')
 
 module.exports = function datum(node){
   return sel(node).datum()
 }
-},{"utilise/sel":35}],14:[function(require,module,exports){
+},{"utilise/sel":29}],12:[function(require,module,exports){
 var has = require('utilise/has')
 
 module.exports = function def(o, p, v, w){
@@ -568,7 +345,7 @@ module.exports = function def(o, p, v, w){
   return o[p]
 }
 
-},{"utilise/has":20}],15:[function(require,module,exports){
+},{"utilise/has":17}],13:[function(require,module,exports){
 var err  = require('utilise/err')('[emitterify]')
   , keys = require('utilise/keys')
   , def  = require('utilise/def')
@@ -623,7 +400,7 @@ module.exports = function emitterify(body) {
     return callback.once = true, body.on(type, callback), body
   }
 }
-},{"utilise/def":14,"utilise/err":16,"utilise/is":24,"utilise/keys":26,"utilise/not":29}],16:[function(require,module,exports){
+},{"utilise/def":12,"utilise/err":14,"utilise/is":21,"utilise/keys":23,"utilise/not":25}],14:[function(require,module,exports){
 var owner = require('utilise/owner')
   , to = require('utilise/to')
 
@@ -635,7 +412,7 @@ module.exports = function err(prefix){
     return console.error.apply(console, args), d
   }
 }
-},{"utilise/owner":30,"utilise/to":37}],17:[function(require,module,exports){
+},{"utilise/owner":26,"utilise/to":31}],15:[function(require,module,exports){
 var is = require('utilise/is')
   , not = require('utilise/not')
   , keys = require('utilise/keys')
@@ -650,15 +427,7 @@ module.exports = function extend(to){
     return to
   }
 }
-},{"utilise/copy":12,"utilise/is":24,"utilise/keys":26,"utilise/not":29}],18:[function(require,module,exports){
-var is = require('utilise/is')  
-
-module.exports = function flatten(p,v){ 
-  is.arr(v) && (v = v.reduce(flatten, []))
-  return (p = p || []), p.concat(v) 
-}
-
-},{"utilise/is":24}],19:[function(require,module,exports){
+},{"utilise/copy":10,"utilise/is":21,"utilise/keys":23,"utilise/not":25}],16:[function(require,module,exports){
 var datum = require('utilise/datum')
   , key = require('utilise/key')
 
@@ -674,11 +443,11 @@ function from(o){
 function fromParent(k){
   return datum(this.parentNode)[k]
 }
-},{"utilise/datum":13,"utilise/key":25}],20:[function(require,module,exports){
+},{"utilise/datum":11,"utilise/key":22}],17:[function(require,module,exports){
 module.exports = function has(o, k) {
   return k in o
 }
-},{}],21:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 var has = require('utilise/has')
 
 module.exports = function header(header, value) {
@@ -691,17 +460,17 @@ module.exports = function header(header, value) {
                                    : d['headers'][header] == value
   }
 }
-},{"utilise/has":20}],22:[function(require,module,exports){
+},{"utilise/has":17}],19:[function(require,module,exports){
 module.exports = function identity(d) {
   return d
 }
-},{}],23:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports = function includes(pattern){
   return function(d){
     return d && d.indexOf && ~d.indexOf(pattern)
   }
 }
-},{}],24:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports = is
 is.fn     = isFunction
 is.str    = isString
@@ -774,7 +543,7 @@ function isIn(set) {
          : d in set
   }
 }
-},{}],25:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var is = require('utilise/is')
   , str = require('utilise/str')
 
@@ -799,11 +568,11 @@ module.exports = function key(k, v){
     }
   }
 }
-},{"utilise/is":24,"utilise/str":36}],26:[function(require,module,exports){
+},{"utilise/is":21,"utilise/str":30}],23:[function(require,module,exports){
 module.exports = function keys(o) {
   return Object.keys(o || {})
 }
-},{}],27:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 var is = require('utilise/is')
   , to = require('utilise/to')
   , owner = require('utilise/owner')
@@ -817,30 +586,22 @@ module.exports = function log(prefix){
     return console.log.apply(console, args), d
   }
 }
-},{"utilise/is":24,"utilise/owner":30,"utilise/to":37}],28:[function(require,module,exports){
-module.exports = function noop(){}
-},{}],29:[function(require,module,exports){
+},{"utilise/is":21,"utilise/owner":26,"utilise/to":31}],25:[function(require,module,exports){
 module.exports = function not(fn){
   return function(){
     return !fn.apply(this, arguments)
   }
 }
-},{}],30:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (global){
 module.exports = require('utilise/client') ? /* istanbul ignore next */ window : global
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"utilise/client":10}],31:[function(require,module,exports){
-module.exports = function prepend(v) {
-  return function(d){
-    return v+d
-  }
-}
-},{}],32:[function(require,module,exports){
+},{"utilise/client":8}],27:[function(require,module,exports){
 module.exports = function raw(selector, doc){
   var prefix = !doc && document.head.createShadowRoot ? 'html /deep/ ' : ''
   return (doc ? doc : document).querySelector(prefix+selector)
 }
-},{}],33:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 module.exports = function(target, source) {
   var i = 1, n = arguments.length, method
   while (++i < n) target[method = arguments[i]] = rebind(target, source, source[method])
@@ -853,17 +614,11 @@ function rebind(target, source, method) {
     return value === source ? target : value
   }
 }
-},{}],34:[function(require,module,exports){
-module.exports = function replace(from, to){
-  return function(d){
-    return d.replace(from, to)
-  }
+},{}],29:[function(require,module,exports){
+module.exports = function sel(el){
+  return el.node ? el : d3.select(el)
 }
-},{}],35:[function(require,module,exports){
-module.exports = function sel(){
-  return d3.select.apply(this, arguments)
-}
-},{}],36:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 var is = require('utilise/is') 
 
 module.exports = function str(d){
@@ -873,7 +628,7 @@ module.exports = function str(d){
        : is.obj(d) ? JSON.stringify(d)
        : String(d)
 }
-},{"utilise/is":24}],37:[function(require,module,exports){
+},{"utilise/is":21}],31:[function(require,module,exports){
 module.exports = { 
   arr: toArray
 , obj: toObject
@@ -897,14 +652,14 @@ function toObject(d) {
     return p
   }
 }
-},{}],38:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var keys = require('utilise/keys')
   , from = require('utilise/from')
 
 module.exports = function values(o) {
   return !o ? [] : keys(o).map(from(o))
 }
-},{"utilise/from":19,"utilise/keys":26}],39:[function(require,module,exports){
+},{"utilise/from":16,"utilise/keys":23}],33:[function(require,module,exports){
 var key = require('utilise/key')
 
 module.exports = function za(k) {
@@ -918,4 +673,325 @@ module.exports = function za(k) {
   }
 }
 
-},{"utilise/key":25}]},{},[1]);
+},{"utilise/key":22}],34:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = sync;
+
+var _identity = require('utilise/identity');
+
+var _identity2 = _interopRequireDefault(_identity);
+
+var _replace = require('utilise/replace');
+
+var _replace2 = _interopRequireDefault(_replace);
+
+var _prepend = require('utilise/prepend');
+
+var _prepend2 = _interopRequireDefault(_prepend);
+
+var _flatten = require('utilise/flatten');
+
+var _flatten2 = _interopRequireDefault(_flatten);
+
+var _values = require('utilise/values');
+
+var _values2 = _interopRequireDefault(_values);
+
+var _header = require('utilise/header');
+
+var _header2 = _interopRequireDefault(_header);
+
+var _client = require('utilise/client');
+
+var _client2 = _interopRequireDefault(_client);
+
+var _noop = require('utilise/noop');
+
+var _noop2 = _interopRequireDefault(_noop);
+
+var _keys = require('utilise/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _key = require('utilise/key');
+
+var _key2 = _interopRequireDefault(_key);
+
+var _str = require('utilise/str');
+
+var _str2 = _interopRequireDefault(_str);
+
+var _not = require('utilise/not');
+
+var _not2 = _interopRequireDefault(_not);
+
+var _by = require('utilise/by');
+
+var _by2 = _interopRequireDefault(_by);
+
+var _is = require('utilise/is');
+
+var _is2 = _interopRequireDefault(_is);
+
+var _jsondiffpatch = require('jsondiffpatch');
+
+/* istanbul ignore next */
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// -------------------------------------------
+// API: Synchronises resources between server/client
+// -------------------------------------------
+function sync(ripple, server) {
+  log('creating');
+
+  if (!_client2.default && !server) return;
+  (0, _values2.default)(ripple.types).map(headers(ripple));
+  ripple.sync = emit(ripple);
+  ripple.io = io(server);
+  ripple.on('change', function (res) {
+    return emit(ripple)()(res.name);
+  });
+  ripple.io.on('change', silent(ripple));
+  ripple.io.on('connection', function (s) {
+    return s.on('change', change(ripple));
+  });
+  ripple.io.on('connection', function (s) {
+    return emit(ripple)(s)();
+  });
+  ripple.io.use(setIP);
+  return ripple;
+}
+
+function change(ripple) {
+  return function (req) {
+    log('receiving', req.name);
+
+    var socket = this,
+        res = ripple.resources[req.name],
+        check = type(ripple)(req).from || _identity2.default;
+
+    if (!res) return log('no resource', req.name);
+    if (!check.call(this, req)) return debug('type skip', req.name);
+    if (!_is2.default.obj(res.body)) return silent(ripple)(req);
+
+    var to = (0, _header2.default)('proxy-to')(res) || _identity2.default,
+        from = (0, _header2.default)('proxy-from')(res),
+        body = to.call(socket, (0, _key2.default)('body')(res)),
+        deltas = (0, _jsondiffpatch.diff)(body, req.body);
+
+    if (_is2.default.arr(deltas)) return delta('') && res.body.emit('change');
+
+    (0, _keys2.default)(deltas).reverse().filter((0, _not2.default)((0, _is2.default)('_t'))).map(paths(deltas)).reduce(_flatten2.default, []).map(delta).some(Boolean) && res.body.emit('change');
+
+    function delta(k) {
+      var d = (0, _key2.default)(k)(deltas),
+          name = req.name
+      // , body  = res.body
+      ,
+          index = k.replace(/(^|\.)_/g, '$1'),
+          type = d.length == 1 ? 'push' : d.length == 2 ? 'update' : d[2] === 0 ? 'remove' : '',
+          value = type == 'update' ? d[1] : d[0],
+          next = types[type];
+
+      if (!type) return false;
+      if (!from || from.call(socket, value, body, index, type, name, next)) {
+        !index ? silent(ripple)(req) : next(index, value, body, name, res);
+        return true;
+      }
+    }
+  };
+}
+
+function paths(base) {
+  return function (k) {
+    var d = (0, _key2.default)(k)(base);
+    k = _is2.default.arr(k) ? k : [k];
+
+    return _is2.default.arr(d) ? k.join('.') : (0, _keys2.default)(d).map((0, _prepend2.default)(k.join('.') + '.')).map(paths(base));
+  };
+}
+
+function push(k, value, body, name) {
+  var path = k.split('.'),
+      tail = path.pop(),
+      o = (0, _key2.default)(path.join('.'))(body) || body;
+
+  _is2.default.arr(o) ? o.splice(tail, 0, value) : (0, _key2.default)(k, value)(body);
+}
+
+function remove(k, value, body, name) {
+  var path = k.split('.'),
+      tail = path.pop(),
+      o = (0, _key2.default)(path.join('.'))(body) || body;
+
+  _is2.default.arr(o) ? o.splice(tail, 1) : delete o[tail];
+}
+
+function update(k, value, body, name) {
+  (0, _key2.default)(k, value)(body);
+}
+
+function headers(ripple) {
+  return function (type) {
+    var parse = type.parse || _noop2.default;
+    type.parse = function (res) {
+      if (_client2.default) return parse.apply(this, arguments), res;
+      var existing = ripple.resources[res.name],
+          from = (0, _header2.default)('proxy-from')(existing),
+          to = (0, _header2.default)('proxy-to')(existing);
+
+      res.headers['proxy-from'] = (0, _header2.default)('proxy-from')(res) || (0, _header2.default)('from')(res) || from;
+      res.headers['proxy-to'] = (0, _header2.default)('proxy-to')(res) || (0, _header2.default)('to')(res) || to;
+      return parse.apply(this, arguments), res;
+    };
+  };
+}
+
+function silent(ripple) {
+  return function (res) {
+    return res.headers.silent = true, ripple(res);
+  };
+}
+
+function io(opts) {
+  var r = !_client2.default ? require('socket.io')(opts.server || opts) : window.io ? window.io() : _is2.default.fn(require('socket.io-client')) ? require('socket.io-client')() : { on: _noop2.default, emit: _noop2.default };
+  r.use = r.use || _noop2.default;
+  return r;
+}
+
+// emit all or some resources, to all or some clients
+function emit(ripple) {
+  return function (socket) {
+    return function (name) {
+      if (arguments.length && !name) return;
+      if (!name) return (0, _values2.default)(ripple.resources).map((0, _key2.default)('name')).map(emit(ripple)(socket)), ripple;
+
+      var res = ripple.resources[name],
+          sockets = _client2.default ? [ripple.io] : ripple.io.of('/').sockets,
+          lgt = stats(sockets.length, name),
+          silent = (0, _header2.default)('silent', true)(res);
+
+      return silent ? delete res.headers.silent : !res ? log('no resource to emit: ', name) : _is2.default.str(socket) ? lgt(sockets.filter((0, _by2.default)('sessionID', socket)).map(to(ripple)(res))) : !socket ? lgt(sockets.map(to(ripple)(res))) : lgt([to(ripple)(res)(socket)]);
+    };
+  };
+}
+
+function to(ripple) {
+  return function (res) {
+    return function (socket) {
+      var body = _is2.default.fn(res.body) ? '' + res.body : res.body,
+          rep,
+          fn = {
+        type: type(ripple)(res).to || _identity2.default,
+        res: res.headers['proxy-to'] || _identity2.default
+      };
+
+      body = fn.res.call(socket, body);
+      if (!body) return false;
+
+      rep = fn.type.call(socket, { name: res.name, body: body, headers: res.headers });
+      if (!rep) return false;
+
+      socket.emit('change', rep);
+      return true;
+    };
+  };
+}
+
+function stats(total, name) {
+  return function (results) {
+    log((0, _str2.default)(results.filter(Boolean).length).green.bold + '/' + (0, _str2.default)(total).green, 'sending', name);
+  };
+}
+
+function setIP(socket, next) {
+  socket.ip = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
+  next();
+}
+
+function type(ripple) {
+  return function (res) {
+    return ripple.types[(0, _header2.default)('content-type')(res)];
+  };
+}
+
+var log = require('utilise/log')('[ri/sync]'),
+    err = require('utilise/err')('[ri/sync]'),
+    debug = _noop2.default,
+    types = { push: push, remove: remove, update: update };
+},{"jsondiffpatch":2,"socket.io":2,"socket.io-client":2,"utilise/by":35,"utilise/client":36,"utilise/err":38,"utilise/flatten":39,"utilise/header":42,"utilise/identity":43,"utilise/is":44,"utilise/key":45,"utilise/keys":46,"utilise/log":47,"utilise/noop":48,"utilise/not":49,"utilise/prepend":51,"utilise/replace":52,"utilise/str":54,"utilise/values":56}],35:[function(require,module,exports){
+var key = require('utilise/key')
+  , is  = require('utilise/is')
+
+module.exports = function by(k, v){
+  var exists = arguments.length == 1
+  return function(o){
+    var d = key(k)(o)
+    
+    return d && v && d.toLowerCase && v.toLowerCase ? d.toLowerCase() === v.toLowerCase()
+         : exists ? Boolean(d)
+         : is.fn(v) ? v(d)
+         : d == v
+  }
+}
+},{"utilise/is":44,"utilise/key":45}],36:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"dup":8}],37:[function(require,module,exports){
+arguments[4][11][0].apply(exports,arguments)
+},{"dup":11,"utilise/sel":53}],38:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14,"utilise/owner":50,"utilise/to":55}],39:[function(require,module,exports){
+var is = require('utilise/is')  
+
+module.exports = function flatten(p,v){ 
+  is.arr(v) && (v = v.reduce(flatten, []))
+  return (p = p || []), p.concat(v) 
+}
+
+},{"utilise/is":44}],40:[function(require,module,exports){
+arguments[4][16][0].apply(exports,arguments)
+},{"dup":16,"utilise/datum":37,"utilise/key":45}],41:[function(require,module,exports){
+arguments[4][17][0].apply(exports,arguments)
+},{"dup":17}],42:[function(require,module,exports){
+arguments[4][18][0].apply(exports,arguments)
+},{"dup":18,"utilise/has":41}],43:[function(require,module,exports){
+arguments[4][19][0].apply(exports,arguments)
+},{"dup":19}],44:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],45:[function(require,module,exports){
+arguments[4][22][0].apply(exports,arguments)
+},{"dup":22,"utilise/is":44,"utilise/str":54}],46:[function(require,module,exports){
+arguments[4][23][0].apply(exports,arguments)
+},{"dup":23}],47:[function(require,module,exports){
+arguments[4][24][0].apply(exports,arguments)
+},{"dup":24,"utilise/is":44,"utilise/owner":50,"utilise/to":55}],48:[function(require,module,exports){
+module.exports = function noop(){}
+},{}],49:[function(require,module,exports){
+arguments[4][25][0].apply(exports,arguments)
+},{"dup":25}],50:[function(require,module,exports){
+arguments[4][26][0].apply(exports,arguments)
+},{"dup":26,"utilise/client":36}],51:[function(require,module,exports){
+module.exports = function prepend(v) {
+  return function(d){
+    return v+d
+  }
+}
+},{}],52:[function(require,module,exports){
+module.exports = function replace(from, to){
+  return function(d){
+    return d.replace(from, to)
+  }
+}
+},{}],53:[function(require,module,exports){
+arguments[4][29][0].apply(exports,arguments)
+},{"dup":29}],54:[function(require,module,exports){
+arguments[4][30][0].apply(exports,arguments)
+},{"dup":30,"utilise/is":44}],55:[function(require,module,exports){
+arguments[4][31][0].apply(exports,arguments)
+},{"dup":31}],56:[function(require,module,exports){
+arguments[4][32][0].apply(exports,arguments)
+},{"dup":32,"utilise/from":40,"utilise/keys":46}]},{},[1]);

@@ -1,6 +1,6 @@
-var core   = require('rijs.core')
-  , data   = require('rijs.data')
-  , sync   = require('rijs.sync')
+var core   = require('rijs.core').default
+  , data   = require('rijs.data').default
+  , sync   = require('rijs.sync').default
   , ripple = sync(data(core()))
   , to = require('utilise/to')
   , all = require('utilise/all')
