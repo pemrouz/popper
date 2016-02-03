@@ -34,7 +34,7 @@ module.exports = function(config){
     , ripple       = (config.ripple || require('rijs').default)(opts)
     , resdir       = require('rijs.resdir').default(ripple, __dirname)
     , debug        = lo(env.NODE_ENV) == 'debug'
-    , ci           = 'npm_package_name' in env
+    , ci           = env.CI === 'true'
     , wd           = require('wd')
     , fs           = require('fs')
     , results      = ripple('results', {}, { from: result })
