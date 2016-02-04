@@ -1,0 +1,41 @@
+{
+  "ie9": { 
+    "browserName": "internet explorer"
+  , "version": "9" 
+  , "platform": "WINDOWS" 
+  }, "ie10": { 
+    "browserName": "internet explorer"
+  , "version": "10" 
+  , "platform": "WINDOWS" 
+  },
+ "ie11": { 
+    "browserName": "internet explorer"
+  , "version": "11" 
+  , "platform": "WINDOWS" 
+  }
+, "firefox": { 
+    "browserName": "firefox"
+  , "platform": "WINDOWS" 
+  }
+, "chrome": { 
+    "browserName": "chrome"
+  , "platform": "WINDOWS" 
+  }
+, "android": { 
+    "browserName": "nexus_one"
+  , "platform": "ANDROID"  
+  }
+, "iphone": { 
+    "browserName": "iPhone"
+  , "device": "iPhone"
+  , "platform": "MAC"  
+  }
+, "opera": { 
+    "browserName": "opera"
+  , "platform": "WINDOWS"  
+  }
+, "safari": { 
+    "browserName": "safari"
+  , "platform": "MAC"  
+  }
+}

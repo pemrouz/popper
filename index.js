@@ -164,9 +164,10 @@ module.exports = function(config){
 
       var host = env.BROWSERSTACK_USERNAME && env.BROWSERSTACK_KEY ? 'hub.browserstack.com'
                : env.SAUCE_USERNAME && env.SAUCE_ACCESS_KEY ? 'ondemand.saucelabs.com'
-               : err('Please provide either your Sauce Labs or BrowserStack Credentials')
-        , user = env.BROWSERSTACK_USERNAME || env.SAUCE_USERNAME
-        , access = env.BROWSERSTACK_KEY || env.SAUCE_ACCESS_KEY
+               : env.TESTINGBOT_KEY && env.TESTINGBOT_SECRET ? 'hub.testingbot.com'
+               : err('Please provide either your Sauce Labs, BrowserStack or TestingBot Credentials')
+        , user = env.BROWSERSTACK_USERNAME || env.SAUCE_USERNAME || env.TESTINGBOT_KEY
+        , access = env.BROWSERSTACK_KEY || env.SAUCE_ACCESS_KEY || env.TESTINGBOT_SECRET
         , vm = wd.remote(host, 80, user, access)
         , id = [opts.browserName + (opts.version || ''), 'on', opts.platform].join(' ')
 
