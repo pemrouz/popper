@@ -12,11 +12,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = { browsers: _browsers2.default, connect: connect };
 
+var err = require('utilise/err')('[popper][browserstack]');
+
 function connect(wd) {
   var env = process.env,
       key = env.BROWSERSTACK_KEY,
       user = env.BROWSERSTACK_USERNAME,
       host = 'hub.browserstack.com';
 
-  return !user || !key ? err('Please provide your BrowserStack Credentials') : wd.remote(host, 80, user, key);
+  return !user || !key ? (err('Please provide your BrowserStack Credentials'), false) : wd.remote(host, 80, user, key);
 }

@@ -300,6 +300,8 @@ var boot = function boot(farm) {
       var id = _name.cyan + ' ' + _version.cyan + ' on ' + _os;
       var vm = _farms2.default[farm].connect(_wd2.default);
 
+      if (!vm) err('failed to connect to ' + farm), process.exit(1);
+
       log('booting up ' + id);
 
       vm.init(opts, function (e) {

@@ -256,6 +256,8 @@ const boot = farm => url => opts => {
       , id = `${_name.cyan} ${_version.cyan} on ${_os}`
       , vm = farms[farm].connect(wd)
 
+  if (!vm) err('failed to connect to ' + farm), process.exit(1)
+
   log(`booting up ${id}`)
   
   vm.init(opts, e => {
