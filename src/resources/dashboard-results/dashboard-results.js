@@ -1,9 +1,8 @@
-module.exports = function dashboardView(results){ 
-  var o = once(this)
-    , suites = first(values(results).filter(key('suites.length')))
+export default function dashboardResults({ results }){ 
+  const o = once(this)
+      , suites = first(values(results).filter(key('suites.length')))
 
-  sel(this.host)
-    .classed('has-results', values(results).length)
+  o.classed('has-results', values(results).length)
 
   o('.no-results', !values(results).length)
     .text('No results available yet')
@@ -40,12 +39,12 @@ module.exports = function dashboardView(results){
     ('[version]', [])
 
   o('.platform')
-    (iconOS, inherit)
+    (iconOS, 1)
       .attr('version', key('os.version'))
       .classed('os', 1)
 
   o('.platform')
-    (iconBrowser, inherit)
+    (iconBrowser, 1)
       .attr('version', key('version'))
    
   o('.browser')
@@ -66,12 +65,12 @@ module.exports = function dashboardView(results){
 
   o('.browser')
     ('.result', proxy(key('suites'), allSuites))
-      ('span', inherit)
+      ('span', 1)
         .text(formatResult)
         .classed('error', by('failures', not(is('0'))))
 
   o('.result')
-    ('i.fails', key('failures'))
+    ('i.fails', proxy(key('failures'), str))
       .classed('error', not(is('0')))
       .text(String)
   o('.result')
@@ -107,7 +106,7 @@ module.exports = function dashboardView(results){
   }
 
   function formatResult(d){
-    return d.running || !d.total || !d.failures ? '...' : Math.round((d.total-d.failures)/d.total*1000)/10 + '%'
+    return !str(d.total) || !str(d.failures) ? '...' : Math.round((d.total-d.failures)/d.total*1000)/10 + '%'
   }
 
 }
