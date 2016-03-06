@@ -83,6 +83,7 @@ function popper() {
   var timeout = _ref.timeout;
   var ripple = _ref.ripple;
 
+
   // defaults
   var wait = debounce(timeout = timeout || +env.POPPER_TIMEOUT || 20000)(quit);
   opts = extend({ server: server, dir: dir })(opts);
@@ -136,14 +137,17 @@ function popper() {
         stream = is.fn(tests) ? tests() : (0, _child_process.spawn)('sh', ['-c', tests], { stdio: 'pipe' }).stdout;(stream.on('end', debounce(500)(reload)).pipe(bundle).flow || noop)();
   }
 
-  function result(r, _, uid) {
-    if (only('dashboard')(this)) return reload(uid.split('.').shift()), true;
+  function result(r, _ref2) {
+    var key = _ref2.key;
+    var value = _ref2.value;
+
+    if (only('dashboard')(this)) return reload(key.split('.').shift()), true;
     log('received result from', this.platform.uid);
-    r.platform = this.platform;
-    ripple('results')[r.platform.uid] = r;
-    ripple.sync()('results');
+    value.platform = this.platform;
+    update(value.platform.uid, value)(ripple('results'));
+    ripple.stream()('results');
     totals();
-    ci(r);
+    ci(value);
   }
 
   function ci(r) {
@@ -193,7 +197,7 @@ function popper() {
   }
 
   function reload(uid) {
-    var agents = ripple.io.of('/').sockets.filter(not(only('dashboard'))).filter(uid ? by('platform.uid', uid) : Boolean).map(emitReload).length;
+    var agents = values(ripple.io.of('/').sockets).filter(not(only('dashboard'))).filter(uid ? by('platform.uid', uid) : Boolean).map(emitReload).length;
 
     log('reloading', str(agents).cyan, 'agents', uid || '');
   }

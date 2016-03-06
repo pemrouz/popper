@@ -86,14 +86,14 @@ export default function popper({
       .flow || noop)()
   }
 
-  function result(r, _, uid){
-    if (only('dashboard')(this)) return reload(uid.split('.').shift()), true
+  function result(r, { key, value }){
+    if (only('dashboard')(this)) return reload(key.split('.').shift()), true
     log('received result from', this.platform.uid)
-    r.platform = this.platform
-    ripple('results')[r.platform.uid] = r
-    ripple.sync()('results')
+    value.platform = this.platform
+    update(value.platform.uid, value)(ripple('results'))
+    ripple.stream()('results')
     totals()
-    ci(r)
+    ci(value)
   }
 
   function ci(r) {
@@ -144,10 +144,10 @@ export default function popper({
   }
 
   function reload(uid) { 
-    const agents = ripple
+    const agents = values(ripple
       .io
       .of('/')
-      .sockets
+      .sockets)
       .filter(not(only('dashboard')))
       .filter(uid ? by('platform.uid', uid) : Boolean)
       .map(emitReload)

@@ -12,6 +12,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = { browsers: _browsers2.default, connect: connect };
 
+
 var err = require('utilise/err')('[popper][browserstack]');
 
 function connect(wd) {
