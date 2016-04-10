@@ -1,5 +1,6 @@
 import debounce from 'utilise/debounce'
 import escape   from 'utilise/escape'
+import noop     from 'utilise/noop'
 import raw      from 'utilise/raw'
 import to       from 'utilise/to'
 import core     from 'rijs.core'
@@ -8,7 +9,7 @@ import sync     from 'rijs.sync'
 
 const ripple = sync(data(core()))
     , con    = window.console
-    , log    = console.log
+    , log    = con ? Function.prototype.bind.call(con.log, con) : noop
 
 var html = ''
   , running = true 
@@ -37,8 +38,8 @@ window.onerror = (message, url, linenumber) =>
 
 // proxy console logs back to terminal
 ;['log', 'info', 'warn', 'error', 'debug'].map(m => {
-  if (!con) return; // ie
-  const sup = window.console[m]
+  if (!con || !con[m]) return; // ie
+  const sup = Function.prototype.bind.call(con[m], con)
   window.console[m] = function(){
     const args = to.arr(arguments)
     ripple.io.emit('console', m, args.map(d => d))
@@ -47,15 +48,16 @@ window.onerror = (message, url, linenumber) =>
 })
 
 // stream results back
-var update = debounce(function(){
+var update = debounce(500)(function(){
   const stats = { running, tests, passes, failures }
       , suites = [{ name, failures, total: tests }]
 
+  output.innerHTML = html
   ripple('results', { stats, suites, html })
 })
 
 // listen on log
-console.log = function(){
+;(window.console = window.console || {}).log = function(){
   const line = to.arr(arguments).join(' ')
   html += escape(line) + '\n'
   
@@ -63,8 +65,7 @@ console.log = function(){
   if (-1 === includes('ok ')(line)) { passes++; tests++ }
   if (-1 === includes('not ok ')(line)) { failures++; tests++ }
 
-  update()
-  output.innerHTML = html
+  if (line.match(/^(?!.*\[ri\/)/)) update()
   log.apply(console, arguments)
 }
 
