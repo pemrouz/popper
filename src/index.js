@@ -234,6 +234,7 @@ const parse = socket => {
 
   if (o.os.name == 'os') o.os.name = 'osx'
   if (o.name == 'chrome mobile') o.name = 'chrome'
+  if (o.name == 'microsoft edge') o.name = 'ie'
 
   const uid = o.name
       + '-' + o.version
