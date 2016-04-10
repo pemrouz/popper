@@ -137,17 +137,19 @@ function popper() {
         stream = is.fn(tests) ? tests() : (0, _child_process.spawn)('sh', ['-c', tests], { stdio: 'pipe' }).stdout;(stream.on('end', debounce(500)(reload)).pipe(bundle).flow || noop)();
   }
 
-  function result(r, _ref2) {
-    var key = _ref2.key;
-    var value = _ref2.value;
+  function result(_ref2, _ref3) {
+    var body = _ref2.body;
+    var key = _ref3.key;
+    var value = _ref3.value;
 
     if (only('dashboard')(this)) return reload(key.split('.').shift()), true;
+    var result = body || value;
     log('received result from', this.platform.uid);
-    value.platform = this.platform;
-    update(value.platform.uid, value)(ripple('results'));
+    result.platform = this.platform;
+    update(result.platform.uid, result)(ripple('results'));
     ripple.stream()('results');
     totals();
-    ci(value);
+    ci(result);
   }
 
   function ci(r) {
@@ -176,8 +178,6 @@ function popper() {
   }
 
   function connected(socket) {
-    var _arguments = arguments;
-
     socket.platform = parse(socket);
     socket.type = only('dashboard')(socket) ? 'dashboard' : 'agent';
     log('connected', socket.platform.uid.green, socket.type.grey);
@@ -186,8 +186,8 @@ function popper() {
       return err('Global error: ', socket.platform.uid.bold, message, url, linenumber);
     });
 
-    if (debug) socket.on('console', function (d) {
-      return log(socket.platform.uid.bold, 'says:', to.arr(_arguments).join(' '));
+    if (debug) socket.on('console', function () {
+      log(socket.platform.uid.bold, 'says:', '', arguments[0], to.arr(arguments[1]).map(str).join(' '));
     });
   }
 
@@ -270,6 +270,7 @@ var parse = function parse(socket) {
 
   if (o.os.name == 'os') o.os.name = 'osx';
   if (o.name == 'chrome mobile') o.name = 'chrome';
+  if (o.name == 'microsoft edge') o.name = 'ie';
 
   var uid = o.name + '-' + o.version + '-' + o.os.name + '-' + o.os.version;
 

@@ -8,6 +8,10 @@ var _escape = require('utilise/escape');
 
 var _escape2 = _interopRequireDefault(_escape);
 
+var _noop = require('utilise/noop');
+
+var _noop2 = _interopRequireDefault(_noop);
+
 var _raw = require('utilise/raw');
 
 var _raw2 = _interopRequireDefault(_raw);
@@ -32,7 +36,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var ripple = (0, _rijs6.default)((0, _rijs4.default)((0, _rijs2.default)())),
     con = window.console,
-    log = console.log;
+    log = con ? Function.prototype.bind.call(con.log, con) : _noop2.default;
 
 var html = '',
     running = true,
@@ -64,8 +68,8 @@ window.onerror = function (message, url, linenumber) {
 
 // proxy console logs back to terminal
 ;['log', 'info', 'warn', 'error', 'debug'].map(function (m) {
-  if (!con) return; // ie
-  var sup = window.console[m];
+  if (!con || !con[m]) return; // ie
+  var sup = Function.prototype.bind.call(con[m], con);
   window.console[m] = function () {
     var args = _to2.default.arr(arguments);
     ripple.io.emit('console', m, args.map(function (d) {
@@ -76,15 +80,16 @@ window.onerror = function (message, url, linenumber) {
 });
 
 // stream results back
-var update = (0, _debounce2.default)(function () {
+var update = (0, _debounce2.default)(500)(function () {
   var stats = { running: running, tests: tests, passes: passes, failures: failures },
       suites = [{ name: name, failures: failures, total: tests }];
 
+  output.innerHTML = html;
   ripple('results', { stats: stats, suites: suites, html: html });
-});
+})
 
 // listen on log
-console.log = function () {
+;(window.console = window.console || {}).log = function () {
   var line = _to2.default.arr(arguments).join(' ');
   html += (0, _escape2.default)(line) + '\n';
 
@@ -96,8 +101,7 @@ console.log = function () {
     failures++;tests++;
   }
 
-  update();
-  output.innerHTML = html;
+  if (line.match(/^(?!.*\[ri\/)/)) update();
   log.apply(console, arguments);
 };
 
