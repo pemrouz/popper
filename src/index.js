@@ -136,7 +136,7 @@ export default function popper({
     socket.on('global err', (message, url, linenumber) => err('Global error: ', socket.platform.uid.bold, message, url, linenumber))
 
     if (debug) 
-      socket.on('console', d => log(socket.platform.uid.bold, 'says:', to.arr(arguments).join(' ')))
+      socket.on('console', function(){ log(socket.platform.uid.bold, 'says:', '', arguments[0], to.arr(arguments[1]).map(str).join(' ')) })
   }
 
   function quit(){
