@@ -86,14 +86,15 @@ export default function popper({
       .flow || noop)()
   }
 
-  function result(r, { key, value }){
+  function result({ body }, { key, value }){
     if (only('dashboard')(this)) return reload(key.split('.').shift()), true
+    const result = body || value
     log('received result from', this.platform.uid)
-    value.platform = this.platform
-    update(value.platform.uid, value)(ripple('results'))
+    result.platform = this.platform
+    update(result.platform.uid, result)(ripple('results'))
     ripple.stream()('results')
     totals()
-    ci(value)
+    ci(result)
   }
 
   function ci(r) {
