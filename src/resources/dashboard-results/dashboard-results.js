@@ -55,7 +55,7 @@ export default function dashboardResults({ results }){
     ('a.run-tests', key('stats'))
       .text('Rerun')
       .classed('disabled', key('running'))
-      .on('click', rerun)
+      .on('click.rerun', rerun)
 
   o('.browser')
     ('a.view-tests', key('platform.uid'))
@@ -81,8 +81,8 @@ export default function dashboardResults({ results }){
       .text(String)
 
   function rerun(d) {
-    d.running = true
-    ripple('results').emit('change')
+    var uid = from.parent.call(this, 'platform').uid
+    update(uid + '.stats.running', true)(ripple('results'))
   }
 
   function allSuites(d) {

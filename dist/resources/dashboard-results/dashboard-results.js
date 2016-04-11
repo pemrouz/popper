@@ -36,7 +36,7 @@ function dashboardResults(_ref) {
 
   o('.browser')('.summary', key('stats')).text(formatSummary);
 
-  o('.browser')('a.run-tests', key('stats')).text('Rerun').classed('disabled', key('running')).on('click', rerun);
+  o('.browser')('a.run-tests', key('stats')).text('Rerun').classed('disabled', key('running')).on('click.rerun', rerun);
 
   o('.browser')('a.view-tests', key('platform.uid')).text('View Results').attr('target', '_blank').attr('href', viewLink);
 
@@ -47,8 +47,8 @@ function dashboardResults(_ref) {
   o('.result')('i.total', key('total')).text(String);
 
   function rerun(d) {
-    d.running = true;
-    ripple('results').emit('change');
+    var uid = from.parent.call(this, 'platform').uid;
+    update(uid + '.stats.running', true)(ripple('results'));
   }
 
   function allSuites(d) {
