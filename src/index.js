@@ -123,8 +123,8 @@ export default function popper({
 
     log('ci targets', str(passed).green.bold, '/', str(target).grey)
     
-      target === passed   ? (!env.POPPER_WAIT && process.exit(0))
-    : target === finished ? process.exit(1)
+      target === passed   ? process.exit(0)
+    : target === finished ? (!env.POPPER_TIMEOUT && process.exit(1))
                           : wait()
   }
 
