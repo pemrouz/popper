@@ -42,8 +42,8 @@ window.onerror = function (message, url, linenumber) {
 
 // proxy console logs back to terminal
 ;['log', 'info', 'warn', 'error', 'debug'].map(function (m) {
-  if (!con) return; // ie
-  var sup = window.console[m];
+  if (!con || !con[m]) return; // ie
+  var sup = Function.prototype.bind.call(con[m], con);
   window.console[m] = function () {
     var args = to.arr(arguments);
     ripple.io.emit('console', m, args.map(function (d) {
