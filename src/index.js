@@ -14,6 +14,7 @@ export default function popper({
    
   // defaults
   const wait = debounce(timeout = timeout || +env.POPPER_TIMEOUT || 20000)(quit)
+      , retries = 3
   opts = extend({ server, dir })(opts)
   ripple = (ripple || rijs)(opts)
   resdir(ripple, dir)
@@ -100,7 +101,7 @@ export default function popper({
   }
 
   function ci(r) {
-    if (!cie || r.stats.running) return
+    if (!isCI || r.stats.running) return
 
     browsers
       .filter(d => {
@@ -207,7 +208,7 @@ const log = require('utilise/log')('[popper]')
     , env = process.env
     , dir = __dirname
     , app = express()
-    , cie  = env.CI === 'true'
+    , isCI  = env.CI === 'true'
     , server = createServer(app) 
     , debug  = lo(env.NODE_ENV) == 'debug'
 
