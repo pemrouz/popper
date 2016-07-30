@@ -77,9 +77,13 @@ export default function popper({
     const bundle = write(local('./client/tests.js'))
         , stream = is.fn(tests) 
             ? tests()
-            : run('sh', ['-c', tests], { stdio: 'pipe' }).stdout
+            : run('sh', ['-c', tests], { stdio: 'pipe' })
+
+    if (process.env.POPPER_DEBUG_TEST)
+      stream.stderr.pipe(process.stderr)
 
     ;(stream
+      .stdout
       .on('end', debounce(500)(reload))
       .pipe(bundle)
       .flow || noop)()
