@@ -1,16 +1,16 @@
 {
   "ie9": { 
     "browserName": "internet explorer"
-  , "version": "9" 
-  , "platform": "WINDOWS" 
+  , "version": "9.0" 
+  , "platform": "Windows 7" 
   , "_name": "ie"
   , "_version": "9"
   , "_os": "windows"
   }
 , "ie11": { 
     "browserName": "internet explorer"
-  , "version": "11" 
-  , "platform": "WINDOWS" 
+  , "version": "11.0" 
+  , "platform": "Windows 7"
   , "_name": "ie"
   , "_version": "11"
   , "_os": "windows"
