@@ -111,7 +111,7 @@ function popper() {
   ripple(require('browser-icons'));
 
   // limit dashboard resources
-  values(ripple.resources).map(key('headers.proxy-to', wrap(only('dashboard'))));
+  ripple.to = limit(ripple.to);
 
   // proxy errors and register agent details
   ripple.io.on('connection', connected);
@@ -137,19 +137,18 @@ function popper() {
         stream = is.fn(tests) ? tests() : (0, _child_process.spawn)('sh', ['-c', tests], { stdio: 'pipe' }).stdout;(stream.on('end', debounce(500)(reload)).pipe(bundle).flow || noop)();
   }
 
-  function result(_ref2, _ref3) {
-    var body = _ref2.body;
-    var key = _ref3.key;
-    var value = _ref3.value;
+  function result(_ref2) {
+    var key = _ref2.key;
+    var value = _ref2.value;
+    var socket = _ref2.socket;
 
-    if (only('dashboard')(this)) return reload(key.split('.').shift()), true;
-    var result = body || value;
-    log('received result from', this.platform.uid);
-    result.platform = this.platform;
-    update(result.platform.uid, result)(ripple('results'));
-    ripple.stream()('results');
+    if (only('dashboard')(socket)) return reload(key.split('.').shift()), true;
+    log('received result from', socket.platform.uid);
+    value.platform = socket.platform;
+    update(value.platform.uid, value)(ripple('results'));
+    ripple.send()('results');
     totals();
-    ci(result);
+    ci(value);
   }
 
   function ci(r) {
@@ -166,6 +165,8 @@ function popper() {
       d.passed_by = r.platform.uid;
       d.passed = !r.stats.failures;
       d.passed ? log('browser passed:', r.platform.uid.green.bold) : err('browser failed:', r.platform.uid.red.bold);
+
+      if (_farms2.default[farm].status) _farms2.default[farm].status(d, r);
     });
 
     var target = browsers.length,
@@ -174,7 +175,11 @@ function popper() {
 
     log('ci targets', str(passed).green.bold, '/', str(target).grey);
 
-    target === passed ? process.exit(0) : target === finished ? !env.POPPER_TIMEOUT && process.exit(1) : wait();
+    target === passed ? time(3000, function (d) {
+      return process.exit(0);
+    }) : target === finished ? time(3000, function (d) {
+      return !env.POPPER_TIMEOUT && process.exit(1);
+    }) : wait();
   }
 
   function connected(socket) {
@@ -285,7 +290,14 @@ var major = function major(v, f) {
 
 var only = function only(path) {
   return function (d) {
-    return includes(path)((this && this.handshake || d.handshake).headers.referer) && d;
+    return includes(path)(d.handshake.headers.referer) && d;
+  };
+};
+
+var limit = function limit(next) {
+  return function (req) {
+    var dashboard = only('dashboard')(req.socket);
+    return dashboard ? next(req) : false;
   };
 };
 
@@ -302,14 +314,18 @@ var boot = function boot(farm) {
 
       var _opts$_os = opts._os;
       var _os = _opts$_os === undefined ? '?' : _opts$_os;
+      var _farms$farm = _farms2.default[farm];
+      var connect = _farms$farm.connect;
+      var _farms$farm$parse = _farms$farm.parse;
+      var parse = _farms$farm$parse === undefined ? identity : _farms$farm$parse;
       var id = _name.cyan + ' ' + _version.cyan + ' on ' + _os;
-      var vm = _farms2.default[farm].connect(_wd2.default);
+      var vm = opts.vm = connect(_wd2.default);
 
       if (!vm) err('failed to connect to ' + farm), process.exit(1);
 
       log('booting up ' + id);
 
-      vm.init(opts, function (e) {
+      vm.init(parse(opts), function (e) {
         if (e) return err(e, id);
         log('initialised', id);
         vm.get(url, function (e) {

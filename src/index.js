@@ -42,8 +42,7 @@ export default function popper({
   ripple(require('browser-icons'))
 
   // limit dashboard resources
-  values(ripple.resources)
-    .map(key('headers.proxy-to', wrap(only('dashboard'))))
+  ripple.to = limit(ripple.to)
   
   // proxy errors and register agent details
   ripple.io.on('connection', connected)
@@ -86,15 +85,14 @@ export default function popper({
       .flow || noop)()
   }
 
-  function result({ body }, { key, value }){
-    if (only('dashboard')(this)) return reload(key.split('.').shift()), true
-    const result = body || value
-    log('received result from', this.platform.uid)
-    result.platform = this.platform
-    update(result.platform.uid, result)(ripple('results'))
-    ripple.stream()('results')
+  function result({ key, value, socket }){
+    if (only('dashboard')(socket)) return reload(key.split('.').shift()), true
+    log('received result from', socket.platform.uid)
+    value.platform = socket.platform
+    update(value.platform.uid, value)(ripple('results'))
+    ripple.send()('results')
     totals()
-    ci(result)
+    ci(value)
   }
 
   function ci(r) {
@@ -115,6 +113,9 @@ export default function popper({
         d.passed
           ? log('browser passed:', r.platform.uid.green.bold)
           : err('browser failed:', r.platform.uid.red.bold)
+
+        if (farms[farm].status)
+          farms[farm].status(d, r)
       })
 
     const target   = browsers.length
@@ -123,8 +124,8 @@ export default function popper({
 
     log('ci targets', str(passed).green.bold, '/', str(target).grey)
     
-      target === passed   ? process.exit(0)
-    : target === finished ? (!env.POPPER_TIMEOUT && process.exit(1))
+      target === passed   ? time(3000, d => process.exit(0))
+    : target === finished ? time(3000, d => (!env.POPPER_TIMEOUT && process.exit(1)))
                           : wait()
   }
 
@@ -251,18 +252,24 @@ const major = (v, f) =>
   : includes('xp')(lo(f)) ? 'xp'
                           : '?'
 
-const only = path => function(d){ return includes(path)(((this && this.handshake) || d.handshake).headers.referer) && d }
+const only = path => d => includes(path)(d.handshake.headers.referer) && d
+
+const limit = next => req => {
+  const dashboard = only('dashboard')(req.socket)
+  return dashboard ? next(req) : false
+}
 
 const boot = farm => url => opts => {
   const { _name = '?', _version = '?', _os = '?' } = opts
+      , { connect, parse = identity } = farms[farm]
       , id = `${_name.cyan} ${_version.cyan} on ${_os}`
-      , vm = farms[farm].connect(wd)
+      , vm = opts.vm = connect(wd)
 
   if (!vm) err('failed to connect to ' + farm), process.exit(1)
 
   log(`booting up ${id}`)
   
-  vm.init(opts, e => {
+  vm.init(parse(opts), e => {
     if (e) return err(e, id)
     log('initialised', id)
     vm.get(url, e => {
