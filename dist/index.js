@@ -161,22 +161,24 @@ function popper() {
 
   function ci(r) {
     if (!isCI || r.stats.running) return;
-    if (r.retries < maxRetries) return log('retrying'.yellow, r.platform.uid, ++r.retries, '/', str(maxRetries).grey), reload(r.platform.uid);
-
-    browsers.filter(function (d) {
-      if (d.passed) return false;
+    console.log("browsers", browsers, r.platform);
+    var browser = browsers.filter(function (d) {
       if (d._name && d._name !== r.platform.name) return false;
       if (d._version && d._version !== r.platform.version) return false;
       if (d._os && d._os !== r.platform.os.name) return false;
       if (d._os_version && d._os_version !== r.platform.os.version) return false;
       return true;
-    }).map(function (d) {
-      d.passed_by = r.platform.uid;
-      d.passed = !r.stats.failures;
-      d.passed ? log('browser passed:', r.platform.uid.green.bold) : err('browser failed:', r.platform.uid.red.bold);
+    }).pop();
 
-      if (_farms2.default[farm].status) _farms2.default[farm].status(d, r.platform);
-    });
+    if (!browser) return log('result not in matrix'.red, r.platform.uid);
+
+    browser.passed_by = r.platform.uid;
+    browser.passed = !r.stats.failures;
+    browser.passed ? log('browser passed:', r.platform.uid.green.bold) : err('browser failed:', r.platform.uid.red.bold);
+
+    if (!browser.passed && r.retries < maxRetries) return log('retrying'.yellow, r.platform.uid, ++r.retries, '/', str(maxRetries).grey), reload(r.platform.uid);
+
+    if (_farms2.default[farm].status) _farms2.default[farm].status(browser, r.platform);
 
     var target = browsers.length,
         passed = browsers.filter(by('passed')).length,
