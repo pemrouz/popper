@@ -161,7 +161,7 @@ function popper() {
 
   function ci(r) {
     if (!isCI || r.stats.running) return;
-    console.log("browsers", browsers, r.platform);
+
     var browser = browsers.filter(function (d) {
       if (d._name && d._name !== r.platform.name) return false;
       if (d._version && d._version !== r.platform.version) return false;
