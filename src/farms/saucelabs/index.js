@@ -18,14 +18,15 @@ function connect(wd) {
 
 function status(browser, platform) {
   browser.vm
-    .sauceJobStatus(browser.passed, e => 
+    .sauceJobStatus(browser.passed, e => {
       e ? err(e) : log(
         'status updated'
       , platform.uid.bold
       , str(browser.passed)[browser.passed ? 'green' : 'red']
       , str(browser.build).grey
       )
-    )
+      browser.vm.quit()
+    })
 }
 
 function parse(opts) {
