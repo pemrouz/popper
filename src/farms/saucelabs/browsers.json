@@ -53,6 +53,6 @@
     "browserName": "safari"
   , "platform": "MAC"  
   , "_name": "safari"
-  , "_os": "mac"
+  , "_os": "osx"
   }
 }
