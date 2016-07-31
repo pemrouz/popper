@@ -14,7 +14,7 @@ export default function popper({
    
   // defaults
   const wait = debounce(timeout = timeout || +env.POPPER_TIMEOUT || 20000)(quit)
-      , retries = 3
+      , maxRetries = 3
   opts = extend({ server, dir })(opts)
   ripple = (ripple || rijs)(opts)
   resdir(ripple, dir)
@@ -91,10 +91,15 @@ export default function popper({
   }
 
   function result({ key, value, socket }){
-    if (only('dashboard')(socket)) return reload(key.split('.').shift()), true
-    log('received result from', socket.platform.uid)
+    if (only('dashboard')(socket)) return reload(key.split('.').shift())
+    const uid = socket.platform.uid
+        , results = ripple('results')
+        , retries = uid in results ? results[uid].retries : 0
+
+    log('received result from', uid)
     value.platform = socket.platform
-    update(value.platform.uid, value)(ripple('results'))
+    value.retries = retries
+    update(uid, value)(ripple('results'))
     ripple.send()('results')
     totals()
     ci(value)
@@ -102,6 +107,9 @@ export default function popper({
 
   function ci(r) {
     if (!isCI || r.stats.running) return
+    if (r.retries < maxRetries) 
+      return log('retrying'.yellow, r.platform.uid, ++r.retries, '/', str(maxRetries).grey) 
+           , reload(r.platform.uid)
 
     browsers
       .filter(d => {
@@ -120,7 +128,7 @@ export default function popper({
           : err('browser failed:', r.platform.uid.red.bold)
 
         if (farms[farm].status)
-          farms[farm].status(d, r)
+          farms[farm].status(d, r.platform)
       })
 
     const target   = browsers.length
@@ -158,7 +166,7 @@ export default function popper({
       .filter(not(only('dashboard')))
       .filter(uid ? by('platform.uid', uid) : Boolean)
       .map(emitReload)
-      .length
+      .length 
 
     log('reloading', str(agents).cyan, 'agents', uid || '')
   }

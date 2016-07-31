@@ -85,7 +85,8 @@ function popper() {
 
 
   // defaults
-  var wait = debounce(timeout = timeout || +env.POPPER_TIMEOUT || 20000)(quit);
+  var wait = debounce(timeout = timeout || +env.POPPER_TIMEOUT || 20000)(quit),
+      maxRetries = 3;
   opts = extend({ server: server, dir: dir })(opts);
   ripple = (ripple || _rijs4.default)(opts);
   (0, _rijs2.default)(ripple, dir);
@@ -144,17 +145,23 @@ function popper() {
     var value = _ref2.value;
     var socket = _ref2.socket;
 
-    if (only('dashboard')(socket)) return reload(key.split('.').shift()), true;
-    log('received result from', socket.platform.uid);
+    if (only('dashboard')(socket)) return reload(key.split('.').shift());
+    var uid = socket.platform.uid,
+        results = ripple('results'),
+        retries = uid in results ? results[uid].retries : 0;
+
+    log('received result from', uid);
     value.platform = socket.platform;
-    update(value.platform.uid, value)(ripple('results'));
+    value.retries = retries;
+    update(uid, value)(ripple('results'));
     ripple.send()('results');
     totals();
     ci(value);
   }
 
   function ci(r) {
-    if (!cie || r.stats.running) return;
+    if (!isCI || r.stats.running) return;
+    if (r.retries < maxRetries) return log('retrying'.yellow, r.platform.uid, ++r.retries, '/', str(maxRetries).grey), reload(r.platform.uid);
 
     browsers.filter(function (d) {
       if (d.passed) return false;
@@ -168,7 +175,7 @@ function popper() {
       d.passed = !r.stats.failures;
       d.passed ? log('browser passed:', r.platform.uid.green.bold) : err('browser failed:', r.platform.uid.red.bold);
 
-      if (_farms2.default[farm].status) _farms2.default[farm].status(d, r);
+      if (_farms2.default[farm].status) _farms2.default[farm].status(d, r.platform);
     });
 
     var target = browsers.length,
@@ -235,7 +242,7 @@ var log = require('utilise/log')('[popper]'),
     env = process.env,
     dir = __dirname,
     app = (0, _express2.default)(),
-    cie = env.CI === 'true',
+    isCI = env.CI === 'true',
     server = (0, _http.createServer)(app),
     debug = lo(env.NODE_ENV) == 'debug';
 

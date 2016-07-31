@@ -16,12 +16,12 @@ function connect(wd) {
        : wd.remote(host, 80, user, key)
 }
 
-function status(browser, result) {
+function status(browser, platform) {
   browser.vm
     .sauceJobStatus(browser.passed, e => 
       e ? err(e) : log(
         'status updated'
-      , result.platform.uid.bold
+      , platform.uid.bold
       , str(browser.passed)[browser.passed ? 'green' : 'red']
       , str(browser.build).grey
       )
