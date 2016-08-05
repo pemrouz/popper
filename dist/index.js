@@ -97,7 +97,7 @@ function popper() {
   ripple('totals', {}, { from: falsy });
 
   // watch files
-  if (watch) {
+  if (!isCI && watch) {
     log('watching', watch);
 
     _chokidar2.default.watch(watch, {
@@ -137,7 +137,7 @@ function popper() {
     var bundle = (0, _fs.createWriteStream)(local('./client/tests.js')),
         stream = is.fn(tests) ? tests() : (0, _child_process.spawn)('sh', ['-c', tests], { stdio: 'pipe' });
 
-    if (process.env.POPPER_DEBUG_TEST) stream.stderr.pipe(process.stderr);(stream.stdout.on('end', debounce(500)(reload)).pipe(bundle).flow || noop)();
+    if (process.env.POPPER_DEBUG_TEST) stream.stderr.pipe(process.stderr);((stream.stdout || stream).on('end', debounce(500)(reload)).pipe(bundle).flow || noop)();
   }
 
   function result(_ref2) {
