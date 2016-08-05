@@ -83,8 +83,7 @@ export default function popper({
     if (process.env.POPPER_DEBUG_TEST)
       stream.stderr.pipe(process.stderr)
 
-    ;(stream
-      .stdout
+    ;((stream.stdout || stream)
       .on('end', debounce(500)(reload))
       .pipe(bundle)
       .flow || noop)()
