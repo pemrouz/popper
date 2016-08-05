@@ -27,7 +27,7 @@ export default function popper({
   ripple('totals' , {}, { from: falsy })
 
   // watch files
-  if (watch) {
+  if (!isCI && watch) {
     log('watching', watch)
 
     chokidar.watch(watch, {
