@@ -80,7 +80,7 @@ export default function popper({
             ? tests()
             : run('sh', ['-c', tests], { stdio: 'pipe' })
 
-    if (process.env.POPPER_DEBUG_TEST)
+    if (stream.stderr) 
       stream.stderr.pipe(process.stderr)
 
     ;((stream.stdout || stream)
