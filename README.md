@@ -191,3 +191,8 @@ If you'd like to add a new test runner, you just need to add a folder [`/client`
   * `index.html`: This is the HTML file that will be run on the test agent. You will also need a script (see `client.js`) that streams back the results of the test.
 
   * `logs.html`: A HTML file that will be used from the dashboard (when you click "View Results") to format the read-only results of the tests run on a specific agent.
+
+
+  # Acknowledgements
+
+  Thanks to BrowserStack and SauceLabs for providing a free open source account for testing.
