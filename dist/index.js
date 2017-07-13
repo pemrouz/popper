@@ -60,29 +60,27 @@ require('colors');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function popper() {
-  var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-  var _ref$tests = _ref.tests;
-  var tests = _ref$tests === undefined ? 'browserify test.js' : _ref$tests;
-  var _ref$farm = _ref.farm;
-  var farm = _ref$farm === undefined ? 'browserstack' : _ref$farm;
-  var _ref$notunnel = _ref.notunnel;
-  var notunnel = _ref$notunnel === undefined ? false : _ref$notunnel;
-  var _ref$runner = _ref.runner;
-  var runner = _ref$runner === undefined ? 'mocha' : _ref$runner;
-  var _ref$browsers = _ref.browsers;
-  var browsers = _ref$browsers === undefined ? [] : _ref$browsers;
-  var _ref$globals = _ref.globals;
-  var globals = _ref$globals === undefined ? '' : _ref$globals;
-  var _ref$port = _ref.port;
-  var port = _ref$port === undefined ? 1945 : _ref$port;
-  var _ref$watch = _ref.watch;
-  var watch = _ref$watch === undefined ? '.' : _ref$watch;
-  var _ref$opts = _ref.opts;
-  var opts = _ref$opts === undefined ? {} : _ref$opts;
-  var timeout = _ref.timeout;
-  var ripple = _ref.ripple;
-
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _ref$tests = _ref.tests,
+      tests = _ref$tests === undefined ? 'browserify test.js' : _ref$tests,
+      _ref$farm = _ref.farm,
+      farm = _ref$farm === undefined ? 'browserstack' : _ref$farm,
+      _ref$notunnel = _ref.notunnel,
+      notunnel = _ref$notunnel === undefined ? false : _ref$notunnel,
+      _ref$runner = _ref.runner,
+      runner = _ref$runner === undefined ? 'mocha' : _ref$runner,
+      _ref$browsers = _ref.browsers,
+      browsers = _ref$browsers === undefined ? [] : _ref$browsers,
+      _ref$globals = _ref.globals,
+      globals = _ref$globals === undefined ? '' : _ref$globals,
+      _ref$port = _ref.port,
+      port = _ref$port === undefined ? 1945 : _ref$port,
+      _ref$watch = _ref.watch,
+      watch = _ref$watch === undefined ? '.' : _ref$watch,
+      _ref$opts = _ref.opts,
+      opts = _ref$opts === undefined ? {} : _ref$opts,
+      timeout = _ref.timeout,
+      ripple = _ref.ripple;
 
   // defaults
   var wait = debounce(timeout = timeout || +env.POPPER_TIMEOUT || 20000)(quit),
@@ -93,7 +91,7 @@ function popper() {
   browsers = browsers.map(canonical(farm)).filter(Boolean);
 
   // define data resources
-  ripple('results', {}, { from: result });
+  ripple('results', {}, { from: from });
   ripple('totals', {}, { from: falsy });
 
   // watch files
@@ -137,15 +135,17 @@ function popper() {
     var bundle = (0, _fs.createWriteStream)(local('./client/tests.js')),
         stream = is.fn(tests) ? tests() : (0, _child_process.spawn)('sh', ['-c', tests], { stdio: 'pipe' });
 
-    if (process.env.POPPER_DEBUG_TEST) stream.stderr.pipe(process.stderr);((stream.stdout || stream).on('end', debounce(500)(reload)).pipe(bundle).flow || noop)();
+    if (stream.stderr) stream.stderr.pipe(process.stderr);((stream.stdout || stream).on('end', debounce(500)(reload)).pipe(bundle).flow || noop)();
   }
 
-  function result(_ref2) {
-    var key = _ref2.key;
-    var value = _ref2.value;
-    var socket = _ref2.socket;
+  function from(req) {
+    return req.type == 'RERUN' ? reload(req.value) : req.type == 'update' ? save(req) : false;
+  }
 
-    if (only('dashboard')(socket)) return reload(key.split('.').shift());
+  function save(_ref2) {
+    var socket = _ref2.socket,
+        value = _ref2.value;
+
     var uid = socket.platform.uid,
         results = ripple('results'),
         retries = uid in results ? results[uid].retries : 0;
@@ -213,7 +213,12 @@ function popper() {
   }
 
   function reload(uid) {
-    var agents = values(ripple.io.of('/').sockets).filter(not(only('dashboard'))).filter(uid ? by('platform.uid', uid) : Boolean).map(emitReload).length;
+    var uids = uid ? [uid] : keys(ripple('results'));
+    uids.map(function (uid) {
+      return update(uid + '.stats.running', true)(ripple('results'));
+    });
+
+    var agents = values(ripple.io.of('/').sockets).filter(not(only('dashboard'))).filter(by('platform.uid', is.in(uids))).map(emitReload).length;
 
     log('reloading', str(agents).cyan, 'agents', uid || '');
   }
@@ -306,31 +311,27 @@ var only = function only(path) {
 };
 
 var limit = function limit(next) {
-  return function (req) {
+  return function (req, socket) {
     var dashboard = only('dashboard')(req.socket);
-    return dashboard ? next(req) : false;
+    return dashboard ? next(req, socket) : false;
   };
 };
 
 var boot = function boot(farm) {
   return function (url) {
     return function (opts) {
-      var _opts$_name = opts._name;
-
-      var _name = _opts$_name === undefined ? '?' : _opts$_name;
-
-      var _opts$_version = opts._version;
-
-      var _version = _opts$_version === undefined ? '?' : _opts$_version;
-
-      var _opts$_os = opts._os;
-      var _os = _opts$_os === undefined ? '?' : _opts$_os;
-      var _farms$farm = _farms2.default[farm];
-      var connect = _farms$farm.connect;
-      var _farms$farm$parse = _farms$farm.parse;
-      var parse = _farms$farm$parse === undefined ? identity : _farms$farm$parse;
-      var id = _name.cyan + ' ' + _version.cyan + ' on ' + _os;
-      var vm = opts.vm = connect(_wd2.default);
+      var _opts$_name = opts._name,
+          _name = _opts$_name === undefined ? '?' : _opts$_name,
+          _opts$_version = opts._version,
+          _version = _opts$_version === undefined ? '?' : _opts$_version,
+          _opts$_os = opts._os,
+          _os = _opts$_os === undefined ? '?' : _opts$_os,
+          _farms$farm = _farms2.default[farm],
+          connect = _farms$farm.connect,
+          _farms$farm$parse = _farms$farm.parse,
+          parse = _farms$farm$parse === undefined ? identity : _farms$farm$parse,
+          id = _name.cyan + ' ' + _version.cyan + ' on ' + _os,
+          vm = opts.vm = connect(_wd2.default);
 
       if (!vm) err('failed to connect to ' + farm), process.exit(1);
 

@@ -4,11 +4,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = dashboardResults;
-function dashboardResults(_ref) {
+function dashboardResults(node, _ref) {
   var results = _ref.results;
+  var o = once(node),
+      suites = first(values(results).filter(key('suites.length'))),
+      _ripple = ripple,
+      send = _ripple.send;
 
-  var o = once(this),
-      suites = first(values(results).filter(key('suites.length')));
 
   o.classed('has-results', values(results).length);
 
@@ -48,7 +50,8 @@ function dashboardResults(_ref) {
 
   function rerun(d) {
     var uid = from.parent.call(this, 'platform').uid;
-    update(uid + '.stats.running', true)(ripple('results'));
+    send('results', 'RERUN', uid);
+    // update(uid + '.stats.running', true)(ripple('results'))
   }
 
   function allSuites(d) {
