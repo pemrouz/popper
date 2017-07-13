@@ -23,7 +23,7 @@ export default function popper({
     .filter(Boolean)
 
   // define data resources
-  ripple('results', {}, { from: result })
+  ripple('results', {}, { from })
   ripple('totals' , {}, { from: falsy })
 
   // watch files
@@ -89,8 +89,13 @@ export default function popper({
       .flow || noop)()
   }
 
-  function result({ key, value, socket }){
-    if (only('dashboard')(socket)) return reload(key.split('.').shift())
+  function from(req){
+    return req.type == 'RERUN'  ? reload(req.value)
+         : req.type == 'update' ? save(req)
+         : false
+  }
+
+  function save({ socket, value }) {
     const uid = socket.platform.uid
         , results = ripple('results')
         , retries = uid in results ? results[uid].retries : 0
@@ -160,12 +165,16 @@ export default function popper({
   }
 
   function reload(uid) { 
+    const uids = uid ? [uid] : keys(ripple('results'))
+    uids
+      .map(uid => update(`${uid}.stats.running`, true)(ripple('results')))
+
     const agents = values(ripple
       .io
       .of('/')
       .sockets)
       .filter(not(only('dashboard')))
-      .filter(uid ? by('platform.uid', uid) : Boolean)
+      .filter(by('platform.uid', is.in(uids)))
       .map(emitReload)
       .length 
 
@@ -268,9 +277,9 @@ const major = (v, f) =>
 
 const only = path => d => includes(path)(d.handshake.headers.referer) && d
 
-const limit = next => req => {
+const limit = next => (req, socket) => {
   const dashboard = only('dashboard')(req.socket)
-  return dashboard ? next(req) : false
+  return dashboard ? next(req, socket) : false
 }
 
 const boot = farm => url => opts => {

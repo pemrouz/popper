@@ -1,6 +1,7 @@
-export default function dashboardResults({ results }){ 
-  const o = once(this)
+export default function dashboardResults(node, { results }){ 
+  const o = once(node)
       , suites = first(values(results).filter(key('suites.length')))
+      , { send } = ripple
 
   o.classed('has-results', values(results).length)
 
@@ -82,7 +83,8 @@ export default function dashboardResults({ results }){
 
   function rerun(d) {
     var uid = from.parent.call(this, 'platform').uid
-    update(uid + '.stats.running', true)(ripple('results'))
+    send('results', 'RERUN', uid)
+    // update(uid + '.stats.running', true)(ripple('results'))
   }
 
   function allSuites(d) {

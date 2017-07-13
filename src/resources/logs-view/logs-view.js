@@ -1,4 +1,4 @@
-export default function logsView({ results }){
+export default function logsView(node, { results }){
   const id = location.pathname.split('dashboard/').pop().replace(/-$/, '-?')
   
   raw('#output').innerHTML = results[id] 

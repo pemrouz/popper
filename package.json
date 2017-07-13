@@ -4,15 +4,12 @@
   "version": "0.2.7",
   "description": "Realtime Cross-Browser Automation",
   "dependencies": {
-    "babel-cli": "*",
-    "babel-preset-es2015": "*",
     "browser-icons": "*",
     "browserify": "^12.0.0",
     "chai": "*",
     "chokidar": "*",
     "colors": "^1.1.2",
     "compression": "*",
-    "d3": "*",
     "express": "^4.12.4",
     "js-yaml": "*",
     "minimist": "*",
@@ -23,7 +20,6 @@
     "serve-static": "*",
     "socket.io": "*",
     "socket.io-client": "*",
-    "util-inspect": "*",
     "utilise": "*",
     "wd": "*"
   },
@@ -31,6 +27,8 @@
     "ngrok": "*"
   },
   "devDependencies": {
+    "babel-cli": "*",
+    "babel-preset-es2015": "*",
     "rijs.core": "*",
     "rijs.data": "*",
     "uglifyjs": "^2.4.10"
@@ -46,8 +44,8 @@
     "clean": "rm -rf dist && mkdir dist",
     "babel": "babel src -d dist --copy-files",
     "build": "npm run clean && npm run babel && npm run sio && npm run bundle",
-    "bundle": "find ./dist/client/*/client.js -exec sh -c \"FILE={}; RUNNER=${FILE:14:-10}; echo bundling client: $RUNNER; browserify dist/client/$RUNNER/client.js -i colors -i socket.io-client -i socket.io -i jsondiffpatch -i **/utilise/**/*.js > dist/client/$RUNNER/client.min.js\" ';'",
-    "sio": "uglifyjs node_modules/socket.io-client/socket.io.js > dist/client/socket.io.min.js",
+    "bundle": "find ./dist/client/*/client.js -exec sh -c \"FILE={}; RUNNER=${FILE:14:-10}; echo bundling client: $RUNNER; browserify dist/client/$RUNNER/client.js -i colors -i socket.io-client -i socket.io -i jsondiffpatch -i utilise -i express -i colors > dist/client/$RUNNER/client.min.js\" ';'",
+    "sio": "uglifyjs node_modules/socket.io-client/dist/socket.io.js > dist/client/socket.io.min.js",
     "replace": "sed -i -E \"s/(= _interopRequire\\(require\\(\\\"utilise\\/)(.+)(\\\"\\)\\))/= window['\\2']/\" client/client.js",
     "version": "npm run build && git add -A",
     "postversion": "git push && git push --tags"
