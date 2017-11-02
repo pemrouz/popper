@@ -1,25 +1,30 @@
 {
   "name": "popper",
-  "main": "dist/index.js",
+  "main": "index.js",
   "version": "1.0.0",
   "description": "Realtime Cross-Browser Automation",
   "dependencies": {
     "browser-icons": "*",
     "browserify": "^12.0.0",
+    "buble": "^0.16.0",
     "chai": "*",
     "chokidar": "*",
     "colors": "^1.1.2",
     "compression": "*",
+    "cryonic": "^1.0.0",
     "express": "^4.12.4",
     "js-yaml": "*",
     "minimist": "*",
     "mocha": "*",
     "platform": "*",
+    "rijs.sync": "rijs/sync",
+    "rijs.core": "*",
+    "rijs.data": "*",
+    "rijs.css": "*",
+    "rijs.fn": "*",
     "rijs": "*",
     "rijs.resdir": "*",
     "serve-static": "*",
-    "socket.io": "*",
-    "socket.io-client": "*",
     "utilise": "*",
     "wd": "*"
   },
@@ -27,10 +32,6 @@
     "ngrok": "*"
   },
   "devDependencies": {
-    "babel-cli": "*",
-    "babel-preset-es2015": "*",
-    "rijs.core": "*",
-    "rijs.data": "*",
     "uglifyjs": "^2.4.10"
   },
   "author": "Pedram Emrouznejad (https://github.com/pemrouz)",
@@ -41,12 +42,7 @@
   "license": "pemrouz.mit-license.org",
   "bin": "./cli",
   "scripts": {
-    "clean": "rm -rf dist && mkdir dist",
-    "babel": "babel src -d dist --copy-files",
-    "build": "npm run clean && npm run babel && npm run sio && npm run bundle",
-    "bundle": "find ./dist/client/*/client.js -exec sh -c \"FILE={}; RUNNER=${FILE:14:-10}; echo bundling client: $RUNNER; browserify dist/client/$RUNNER/client.js -i colors -i socket.io-client -i socket.io -i jsondiffpatch -i utilise -i express -i colors > dist/client/$RUNNER/client.min.js\" ';'",
-    "sio": "uglifyjs node_modules/socket.io-client/dist/socket.io.js > dist/client/socket.io.min.js",
-    "replace": "sed -i -E \"s/(= _interopRequire\\(require\\(\\\"utilise\\/)(.+)(\\\"\\)\\))/= window['\\2']/\" client/client.js",
+    "build": "find ./client/*/client.js -exec sh -c \"FILE={}; RUNNER=${FILE:9:-10}; echo bundling client: $RUNNER; buble ./client/$RUNNER/client.js | browserify - -i utilise -i express -i colors > client/$RUNNER/client.min.js\" ';'",
     "version": "npm run build && git add -A",
     "postversion": "git push && git push --tags"
   }
