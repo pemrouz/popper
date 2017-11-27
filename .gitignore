@@ -1,4 +1,4 @@
 node_modules
 coverage
 *.log
-dist/client/tests.js
+client/tests.js

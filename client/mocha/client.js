@@ -8,12 +8,6 @@ const ripple = sync(data(core()))
     , to     = require('utilise/to')
     , con    = window.console
 
-// reload on force reload
-// ripple.io.on('reload', reload)
-
-// after first connect, reload on reconnect
-// ripple.io.on('connect', d => ripple.io.on('connect', reload))
-
 // send tests-starting signal
 ripple.send('results', 'SAVE', { 
   stats: { running: true }
@@ -53,8 +47,4 @@ function suite(s){
   , total: '' + all('.test', s).length
   , failures: '' + all('.fail', s).length
   }
-}
-
-function reload() {
-  location.reload()
 }

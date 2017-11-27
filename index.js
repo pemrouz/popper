@@ -93,7 +93,7 @@ module.exports = function popper({
   function from(req){
     return req.data.type == 'RERUN'  ? reload(req.data.value)
          : req.data.type == 'SAVE'   ? save(req.socket.platform, req.data.value)
-                                     : req
+                                     : false
   }
 
   function save(platform, result) {
@@ -215,15 +215,7 @@ const { values, key, str, not, by, grep, lo, is, debounce, extend, falsy, send, 
     , serve = require('serve-static')
     , farms = require('./farms')
     , wd = require('wd')
-    , rijs = opts => {
-        const ripple = require('rijs.core')()
-        require('rijs.fn')(ripple, opts)
-        require('rijs.css')(ripple, opts)
-        require('rijs.data')(ripple, opts)
-        require('rijs.sync')(ripple, opts)
-        require('rijs.resdir')(ripple, opts)
-        return ripple
-      }
+    , rijs = opts => require('rijs.npm')(require('rijs')(opts))
 
 const log = require('utilise/log')('[popper]')
     , err = require('utilise/err')('[popper]')

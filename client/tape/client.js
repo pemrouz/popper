@@ -19,22 +19,16 @@ var html = ''
   , name = 'All Tests'
   , output = raw('pre')
 
-// reload on force reload
-ripple.io.on('reload', reload)
-
-// after first connect, reload on reconnect
-ripple.io.on('connect', d => ripple.io.on('connect', reload))
-
 // send tests-starting signal
-ripple('results', { 
+ripple.send('results', 'SAVE', { 
   stats: { running }
 , suites: []
 , html: 'Test in progress..'
 })
 
 // proxy errors back to terminal
-window.onerror = (message, url, linenumber) => 
-  ripple.io.emit('global err', message, url, linenumber)
+// window.onerror = (message, url, linenumber) => 
+//   ripple.io.emit('global err', message, url, linenumber)
 
 // proxy console logs back to terminal
 ;['log', 'info', 'warn', 'error', 'debug'].map(m => {
@@ -42,7 +36,7 @@ window.onerror = (message, url, linenumber) =>
   const sup = Function.prototype.bind.call(con[m], con)
   window.console[m] = function(){
     const args = to.arr(arguments)
-    ripple.io.emit('console', m, args.map(d => d))
+    // ripple.io.emit('console', m, args.map(d => d))
     sup.apply && sup.apply(con, arguments)
   }
 })
@@ -53,7 +47,7 @@ var update = debounce(500)(function(){
       , suites = [{ name, failures, total: tests }]
 
   output.innerHTML = html
-  ripple('results', { stats, suites, html })
+  ripple.send('results', 'SAVE', { stats, suites, html })
 })
 
 // listen on log
@@ -67,8 +61,4 @@ var update = debounce(500)(function(){
 
   if (line.match(/^(?!.*\[ri\/)/)) update()
   log.apply(console, arguments)
-}
-
-function reload() {
-  location.reload()
 }

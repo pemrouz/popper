@@ -1,12 +1,8 @@
 module.exports = class dashboardResults {
   init(node){
-    ['results', 'totals']
-      .map(ripple.subscribe)
-      .map($ => $)
-
     ripple
       .subscribe(['results', 'totals'])
-      .map(([results, totals]) => (node.state = { results, totals, ...node.state }))
+      .map(([results, totals]) => Object.assign(node.state, { results, totals }))
       .map(d => node.draw())
       // .until(node.once('removed'))
   }
